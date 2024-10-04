@@ -1,0 +1,115 @@
+                                          List of relations
+ Schema |      Name       | Type  |  Owner   | Persistence | Access method |    Size    | Description 
+--------+-----------------+-------+----------+-------------+---------------+------------+-------------
+ public | categories      | table | postgres | permanent   | heap          | 16 kB      | 
+ public | events          | table | postgres | permanent   | heap          | 16 kB      | 
+ public | organizations   | table | postgres | permanent   | heap          | 16 kB      | 
+ public | spatial_ref_sys | table | postgres | permanent   | heap          | 6936 kB    | 
+ public | tickets         | table | postgres | permanent   | heap          | 8192 bytes | 
+ public | users           | table | postgres | permanent   | heap          | 16 kB      | 
+ public | venues          | table | postgres | permanent   | heap          | 16 kB      | 
+(7 rows)
+
+                                         Table "public.users"
+    Column    |            Type             | Collation | Nullable |              Default              
+--------------+-----------------------------+-----------+----------+-----------------------------------
+ id           | integer                     |           | not null | nextval('users_id_seq'::regclass)
+ username     | character varying(50)       |           | not null | 
+ display_name | character varying(100)      |           |          | 
+ password     | character varying(255)      |           | not null | 
+ user_type    | character varying(20)       |           | not null | 
+ email        | character varying(100)      |           | not null | 
+ phone_number | character varying(20)       |           |          | 
+ created_at   | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_username_key" UNIQUE CONSTRAINT, btree (username)
+Referenced by:
+    TABLE "tickets" CONSTRAINT "tickets_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id)
+
+                                              Table "public.events"
+        Column         |            Type             | Collation | Nullable |              Default               
+-----------------------+-----------------------------+-----------+----------+------------------------------------
+ id                    | integer                     |           | not null | nextval('events_id_seq'::regclass)
+ name                  | character varying(100)      |           | not null | 
+ image                 | character varying(255)      |           |          | 
+ venue_id              | integer                     |           |          | 
+ status                | character varying(20)       |           |          | 
+ registration_deadline | timestamp without time zone |           |          | 
+ category_id           | integer                     |           |          | 
+ start_date            | timestamp without time zone |           |          | 
+ contact_email         | character varying(100)      |           |          | 
+ create_date           | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+ organizer_id          | integer                     |           |          | 
+ end_date              | timestamp without time zone |           |          | 
+ capacity              | integer                     |           |          | 
+ registration_link     | character varying(255)      |           |          | 
+ registration_required | boolean                     |           |          | 
+ details               | text                        |           |          | 
+ update_date           | timestamp without time zone |           |          | 
+ contact_phone_number  | character varying(20)       |           |          | 
+Indexes:
+    "events_pkey" PRIMARY KEY, btree (id)
+    "idx_events_category" btree (category_id)
+    "idx_events_organizer" btree (organizer_id)
+    "idx_events_venue" btree (venue_id)
+Foreign-key constraints:
+    "events_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id)
+    "events_organizer_id_fkey" FOREIGN KEY (organizer_id) REFERENCES organizations(id)
+    "events_venue_id_fkey" FOREIGN KEY (venue_id) REFERENCES venues(id)
+Referenced by:
+    TABLE "tickets" CONSTRAINT "tickets_event_id_fkey" FOREIGN KEY (event_id) REFERENCES events(id)
+
+                                       Table "public.organizations"
+    Column     |          Type          | Collation | Nullable |                  Default                  
+---------------+------------------------+-----------+----------+-------------------------------------------
+ id            | integer                |           | not null | nextval('organizations_id_seq'::regclass)
+ name          | character varying(100) |           | not null | 
+ description   | text                   |           |          | 
+ contact_email | character varying(100) |           |          | 
+ phone_number  | character varying(20)  |           |          | 
+Indexes:
+    "organizations_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "events" CONSTRAINT "events_organizer_id_fkey" FOREIGN KEY (organizer_id) REFERENCES organizations(id)
+
+                                      Table "public.venues"
+   Column    |          Type          | Collation | Nullable |              Default               
+-------------+------------------------+-----------+----------+------------------------------------
+ id          | integer                |           | not null | nextval('venues_id_seq'::regclass)
+ name        | character varying(100) |           | not null | 
+ location    | geography(Point,4326)  |           | not null | 
+ description | text                   |           |          | 
+ address     | character varying(255) |           |          | 
+ capacity    | integer                |           |          | 
+Indexes:
+    "venues_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "events" CONSTRAINT "events_venue_id_fkey" FOREIGN KEY (venue_id) REFERENCES venues(id)
+
+                                   Table "public.tickets"
+      Column       |            Type             | Collation | Nullable |      Default      
+-------------------+-----------------------------+-----------+----------+-------------------
+ event_id          | integer                     |           | not null | 
+ user_id           | integer                     |           | not null | 
+ ticket_no         | character varying(50)       |           |          | 
+ registration_date | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+ status            | character varying(20)       |           |          | 
+Indexes:
+    "tickets_pkey" PRIMARY KEY, btree (event_id, user_id)
+Foreign-key constraints:
+    "tickets_event_id_fkey" FOREIGN KEY (event_id) REFERENCES events(id)
+    "tickets_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id)
+
+                                      Table "public.categories"
+   Column    |         Type          | Collation | Nullable |                Default                 
+-------------+-----------------------+-----------+----------+----------------------------------------
+ id          | integer               |           | not null | nextval('categories_id_seq'::regclass)
+ name        | character varying(50) |           | not null | 
+ description | text                  |           |          | 
+Indexes:
+    "categories_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "events" CONSTRAINT "events_category_id_fkey" FOREIGN KEY (category_id) REFERENCES categories(id)
+
