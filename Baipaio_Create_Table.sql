@@ -1,10 +1,13 @@
 -- Drop tables if they exist
-DROP TABLE IF EXISTS tickets, ticket;
-DROP TABLE IF EXISTS events, event;
-DROP TABLE IF EXISTS organizations, organization;
-DROP TABLE IF EXISTS venues, venue;
-DROP TABLE IF EXISTS categories, category;
-DROP TABLE IF EXISTS users, user, "User";
+DROP TABLE IF EXISTS tickets;
+DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS organizations;
+DROP TABLE IF EXISTS venues;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
+
+-- Create extension
+CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- Create users table
 CREATE TABLE users (
@@ -44,7 +47,7 @@ CREATE TABLE organizations (
     phone_number VARCHAR(20)
 );
 
--- Create events table
+-- Create events table (depends on venues, categories, and organizations)
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -66,7 +69,7 @@ CREATE TABLE events (
     contact_phone_number VARCHAR(20)
 );
 
--- Create tickets table
+-- Create tickets table (depends on users and events)
 CREATE TABLE tickets (
     event_id INTEGER REFERENCES events(id),
     user_id INTEGER REFERENCES users(id),
@@ -80,4 +83,3 @@ CREATE TABLE tickets (
 CREATE INDEX idx_events_category ON events(category_id);
 CREATE INDEX idx_events_venue ON events(venue_id);
 CREATE INDEX idx_events_organizer ON events(organizer_id);
-
