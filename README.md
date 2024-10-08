@@ -22,7 +22,7 @@ The **Baipiao Management System** is a comprehensive database system designed to
 npm i
 ```
 
-#### RUn the application
+#### Run the application
 ```bash
 npm run serve
 ```
@@ -30,8 +30,8 @@ npm run serve
 ### 2. Backend: Spring Boot
 
 #### Install Dependencies
-# Command to build and run the backend
-# (Please provide specific build and run instructions)
+##### Command to build and run the backend
+##### (Please provide specific build and run instructions)
 ```bash
 (Please provide specific build and run instructions)
 ```
