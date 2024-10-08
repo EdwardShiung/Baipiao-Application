@@ -19,7 +19,7 @@ The **Baipiao Management System** is a comprehensive database system designed to
 
 #### Install Dependencies
 ```bash
-npm i
+npm install
 ```
 
 #### Run the application
