@@ -1,4 +1,4 @@
-# CS5614_Baipiao-Application
+# Baipiao-Application
 
 # Baipiao Management System
 
