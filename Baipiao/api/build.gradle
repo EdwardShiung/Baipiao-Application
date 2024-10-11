@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.baipiao'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+  
+  
+
+    // Hibernate JPA and Hibernate Spatial dependencies
+    implementation 'org.hibernate:hibernate-core:6.5.3.Final'
+
+    // JTS (Java Topology Suite) for spatial data types
+    implementation 'org.locationtech.jts:jts-core:1.20.0'
+    implementation "org.hibernate.orm:hibernate-spatial:6.4.4.Final"
+    // PostgreSQL JDBC driver
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+
+    // Spring Boot Data JPA starter (aligned with Jakarta EE 9+)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    implementation 'net.postgis:postgis-jdbc:2.5.1'
+
+    // Springdoc OpenAPI
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // Spring Web starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Jackson Datatype for Java 8 date/time support
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.n52.jackson:jackson-datatype-jts:1.2.10'
+    
+    // Spring HATEOAS for hypermedia support
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+
+    // Lombok for reducing boilerplate code
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Test dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'com.h2database:h2'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.named('bootJar') {
+    mainClass.set('com.baipiao.api.ApiApplication')
+}
