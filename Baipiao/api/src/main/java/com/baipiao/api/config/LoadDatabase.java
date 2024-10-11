@@ -1,5 +1,10 @@
 package com.baipiao.api.config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -22,106 +27,82 @@ import com.baipiao.api.venues.VenueRepository;
 public class LoadDatabase {
     private static final Logger log = LoggerFactory.getLogger(LoadDatabase.class);
     private final GeometryFactory geometryFactory = new GeometryFactory();
+    private final Random random = new Random();
 
     @Bean
     CommandLineRunner initDatabase(EventRepository eventRepository, UserRepository userRepository,
                                    VenueRepository venueRepository, OrganizationRepository organizationRepository) {
 
         return args -> {
-            // Users
-            log.info("Preloading " + userRepository.save(new User("john.hokie@vt.edu", "johnhokie", "password1", "USER", "John", "Hokie")));
-            log.info("Preloading " + userRepository.save(new User("jane.hokie@vt.edu", "janehokie", "password2", "USER", "Jane", "Hokie")));
+            // Random user data
+            List<String> firstNames = Arrays.asList("John", "Jane", "Alex", "Emily", "Michael", "Sara", "Robert", "Anna", "David", "Laura");
+            List<String> lastNames = Arrays.asList("Smith", "Johnson", "Brown", "Davis", "Miller", "Wilson", "Taylor", "Anderson", "Thomas", "Moore");
 
-            // Organizations
-            Organization vtOrg = new Organization("Virginia Tech", "Virginia Tech organization", "http://vt.edu", "info@vt.edu", "555-123-9876", "Blacksburg, VA");
-            Organization townBlacksburg = new Organization("Town of Blacksburg", "Blacksburg town organization", "http://blacksburg.gov", "info@blacksburg.gov", "555-654-1234", "Blacksburg, VA");
+            // Random organization data
+            List<String> orgNames = Arrays.asList("Tech Innovators", "Blacksburg Council", "Hokie Sports", "Blacksburg Arts", "VT Alumni Association");
 
-            log.info("Preloading " + organizationRepository.save(vtOrg));
-            log.info("Preloading " + organizationRepository.save(townBlacksburg));
+            // Random venue data
+            List<String> venueNames = Arrays.asList("Lane Stadium", "Squires Student Center", "Downtown Blacksburg", "Blacksburg Park", "Tech Hall", "VT Sports Arena", "Blacksburg Mall", "Heritage Museum", "The Lyric Theater", "Blacksburg Library", "Cassell Coliseum", "VT Quad", "Main Street Plaza", "University Plaza", "Research Park");
 
-            // Venues
-            Point laneStadiumLocation = geometryFactory.createPoint(new Coordinate(-80.4181, 37.2296)); // Lane Stadium
-            Point squiresLocation = geometryFactory.createPoint(new Coordinate(-80.4191, 37.2289)); // Squires Student Center
-            Point downtownBlacksburg = geometryFactory.createPoint(new Coordinate(-80.4139, 37.2297)); // Downtown Blacksburg
+            // Users (10 users with unique emails)
+            List<User> users = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                String firstName = firstNames.get(random.nextInt(firstNames.size()));
+                String lastName = lastNames.get(random.nextInt(lastNames.size()));
+                // Generate a unique email by appending the index `i`
+                String email = firstName.toLowerCase() + "." + lastName.toLowerCase() + i + "@example.com";
+                String username = firstName.toLowerCase() + random.nextInt(1000);
+                User user = new User(email, username, "password" + random.nextInt(1000), "USER", firstName, lastName);
+                users.add(user);
+                log.info("Preloading " + userRepository.save(user));
+            }
 
-            Venue laneStadium = new Venue("Lane Stadium", "Virginia Tech's football stadium", laneStadiumLocation);
-            Venue squiresStudentCenter = new Venue("Squires Student Center", "Central building for events and student activities", squiresLocation);
-            Venue downtown = new Venue("Downtown Blacksburg", "Main downtown area of Blacksburg", downtownBlacksburg);
+            // Organizations (5 organizations)
+            List<Organization> organizations = new ArrayList<>();
+            for (String orgName : orgNames) {
+                Organization org = new Organization(
+                    orgName, 
+                    orgName + " organization", 
+                    "http://" + orgName.toLowerCase().replace(" ", "") + ".com", 
+                    "info@" + orgName.toLowerCase().replace(" ", "") + ".com", 
+                    "555-" + (1000 + random.nextInt(9000)), 
+                    "Blacksburg, VA"
+                );
+                organizations.add(org);
+                log.info("Preloading " + organizationRepository.save(org));
+            }
 
-            log.info("Preloading " + venueRepository.save(laneStadium));
-            log.info("Preloading " + venueRepository.save(squiresStudentCenter));
-            log.info("Preloading " + venueRepository.save(downtown));
+            // Venues (15 venues with random locations around Blacksburg)
+            List<Venue> venues = new ArrayList<>();
+            for (String venueName : venueNames) {
+                Point location = geometryFactory.createPoint(new Coordinate(
+                    -80.4200 + (random.nextDouble() * 0.02),  // Longitude
+                    37.2300 + (random.nextDouble() * 0.02)   // Latitude
+                ));
+                Venue venue = new Venue(venueName, "Description of " + venueName, location);
+                venues.add(venue);
+                log.info("Preloading " + venueRepository.save(venue));
+            }
 
-            // Events related to Virginia Tech and Blacksburg
-            log.info("Preloading " + eventRepository.save(new Event(
-                    "Virginia Tech Hokie Football Game",  // Event Name
-                    true,  // Registration Required
-                    "Come watch the Hokies take on our rivals at Lane Stadium in Blacksburg, VA!",  // Details
-                    "tickets@hokiesports.com",  // Contact Email
-                    "555-123-4567",  // Contact Phone Number
-                    "Scheduled",  // Status
-                    66000,  // Capacity
-                    "http://hokiesports.com/register/footballgame",  // Registration Link
-                    "http://hokiesports.com/images/football.jpg",  // Image URL
-                    vtOrg,  // Organizer
-                    laneStadium  // Venue
-            )));
-
-            log.info("Preloading " + eventRepository.save(new Event(
-                    "Virginia Tech Career Fair",
-                    true,
-                    "Meet top employers looking for talented Hokies at the Virginia Tech Career Fair. Open to all students.",
-                    "career@vt.edu",
-                    "555-987-6543",
-                    "Scheduled",
-                    5000,
-                    "http://career.vt.edu/register/careerfair",
-                    "http://career.vt.edu/images/careerfair.jpg",
-                    vtOrg,
-                    squiresStudentCenter
-            )));
-
-            log.info("Preloading " + eventRepository.save(new Event(
-                    "Blacksburg Art Festival",
-                    false,
-                    "Explore the best local art from students and residents at the Blacksburg Art Festival. Open to everyone.",
-                    "blacksburgartfest@example.com",
-                    "555-654-3210",
-                    "Ongoing",
-                    2000,
-                    "http://blacksburgartfest.com/register",
-                    "http://blacksburgartfest.com/images/artfestival.jpg",
-                    townBlacksburg,
-                    downtown
-            )));
-
-            log.info("Preloading " + eventRepository.save(new Event(
-                    "Virginia Tech Engineering Expo",
-                    true,
-                    "Showcase your engineering skills and meet top companies in the field at the Engineering Expo.",
-                    "engineering@vt.edu",
-                    "555-321-9876",
-                    "Scheduled",
-                    3000,
-                    "http://engineering.vt.edu/register/expo",
-                    "http://engineering.vt.edu/images/expo.jpg",
-                    vtOrg,
-                    squiresStudentCenter
-            )));
-
-            log.info("Preloading " + eventRepository.save(new Event(
-                    "Blacksburg Music Festival",
-                    false,
-                    "Join us for a night of live music from Virginia Tech students and local bands at the Blacksburg Music Festival.",
-                    "musicfest@blacksburg.com",
-                    "555-789-1234",
-                    "Upcoming",
-                    500,
-                    "http://blacksburgmusicfest.com/register",
-                    "http://blacksburgmusicfest.com/images/musicfestival.jpg",
-                    townBlacksburg,
-                    downtown
-            )));
+            // Events (50 events)
+            for (int i = 1; i <= 50; i++) {
+                Organization organizer = organizations.get(random.nextInt(organizations.size())); // Random organizer
+                Venue venue = venues.get(random.nextInt(venues.size())); // Random venue
+                Event event = new Event(
+                        "Event " + i,  // Event Name
+                        random.nextBoolean(),  // Randomly assign registration requirement
+                        "Details of Event " + i,
+                        "contact" + i + "@event.com",  // Contact Email
+                        "555-000-" + i,  // Contact Phone Number
+                        "Scheduled",  // Status
+                        100 + random.nextInt(900),  // Random capacity between 100 and 1000
+                        "http://event" + i + ".com/register",  // Registration Link
+                        "http://event" + i + ".com/images/event" + i + ".jpg",  // Image URL
+                        organizer,  // Organizer
+                        venue  // Venue
+                );
+                log.info("Preloading " + eventRepository.save(event));
+            }
         };
     }
 }
