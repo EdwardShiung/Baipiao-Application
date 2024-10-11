@@ -20,6 +20,3 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 #########
 ###
-增加 footer
-
-修正 A Month Ago --> Month Ago

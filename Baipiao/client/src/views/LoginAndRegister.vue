@@ -126,7 +126,6 @@ import jwt_decode from "jwt-decode";
               // 解析token
               const decode = jwt_decode(token);
 
-              //存储数据
               // this.$store.dispatch("setIsAutnenticated", !this.isEmpty(decode));
               // this.$store.dispatch("setUser", decode);
                 this.$router.push('/');

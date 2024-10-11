@@ -166,7 +166,7 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await axios.get("http://localhost:8080/events");
+        const response = await this.$http.get("events");
         this.events = response.data;
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -174,8 +174,8 @@ export default {
     },
     createEvent() {
       // Send the new event to the server
-      axios
-        .post("http://localhost:8080/events", this.newEvent)
+      this.$http
+        .post("events", this.newEvent)
         .then((response) => {
           this.events.push(response.data); // Add the new event to the list
           this.closeModal(); // Close the modal after creation

@@ -39,7 +39,7 @@ export default{
     methods: {
       async fetchData() {
           try {
-              const response = await axios.get("events");
+              const response = await this.$http.get("events");
               // Assuming the API returns an array of event objects
               this.events = response.data; 
           } catch (error) {
