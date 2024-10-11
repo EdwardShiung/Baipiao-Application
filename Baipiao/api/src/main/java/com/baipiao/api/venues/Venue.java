@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Point;
 import com.baipiao.api.users.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,6 +37,7 @@ public class Venue {
     private String description;
 
     // PostGIS point attribute for location (latitude, longitude)
+    @JsonSerialize(using = PointSerializer.class)  // Custom serializer
     @Column(columnDefinition = "geometry(Point,4326)")  // WGS 84 (SRID 4326)
     private Point location;
 
