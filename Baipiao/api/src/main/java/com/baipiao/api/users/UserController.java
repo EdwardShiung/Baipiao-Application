@@ -1,17 +1,24 @@
 package com.baipiao.api.users;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RestController
 @Tag(name = "Users", description = "REST endpoints for managing users")
@@ -52,8 +59,6 @@ public class UserController {
     public ResponseEntity<User> newUser(@Valid @RequestBody User newUser) {
         // Set timestamps
         newUser.setCreatedAt(LocalDateTime.now());
-        newUser.setUpdatedAt(LocalDateTime.now());
-
         User savedUser = repository.save(newUser);
         return ResponseEntity.status(201).body(savedUser);
     }
@@ -94,6 +99,11 @@ public class UserController {
         return repository.findById(id)
                 .map(user -> {
                     // Update fields
+                    user.setCreatedAt(newUser.getCreatedAt());
+                    user.setDisplayName(newUser.getDisplayName());
+                    user.setEmail(newUser.getEmail());
+                    user.setPhoneNumber(newUser.getPhoneNumber());
+                    user.setUserType(newUser.getUserType());
                     user.setEmail(newUser.getEmail());
                     user.setUserName(newUser.getUserName());
 
@@ -101,28 +111,11 @@ public class UserController {
                     if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
                         user.setPassword(newUser.getPassword());
                     }
-
-                    user.setRole(newUser.getRole());
-                    user.setProfilePicture(newUser.getProfilePicture());
-                    user.setActive(newUser.isActive());
-                    user.setVerified(newUser.isVerified());
-                    user.setFirstName(newUser.getFirstName());
-                    user.setLastName(newUser.getLastName());
-                    user.setDisplayName(newUser.getDisplayName());
-                    user.setPhone(newUser.getPhone());
-                    user.setBio(newUser.getBio());
-                    user.setWebsite(newUser.getWebsite());
-                    // Update the timestamp
-                    user.setUpdatedAt(LocalDateTime.now());
-                    User updatedUser = repository.save(user);
-                    return ResponseEntity.ok(updatedUser);
+                    ///TODO
+                    return ResponseEntity.ok(user);
                 })
                 .orElseGet(() -> {
-                    // If user doesn't exist, create a new one
-                    newUser.setId(id);
                     newUser.setCreatedAt(LocalDateTime.now());
-                    newUser.setUpdatedAt(LocalDateTime.now());
-
                     User savedUser = repository.save(newUser);
                     return ResponseEntity.status(201).body(savedUser);
                 });

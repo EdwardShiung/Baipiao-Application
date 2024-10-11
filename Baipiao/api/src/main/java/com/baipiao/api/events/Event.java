@@ -1,17 +1,20 @@
 package com.baipiao.api.events;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import com.baipiao.api.categories.Category;
 import com.baipiao.api.organizations.Organization;
 import com.baipiao.api.venues.Venue;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -20,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
+@Table(name = "events")
 public class Event implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // Matches SQL SERIAL
@@ -45,6 +49,18 @@ public class Event implements Serializable {
 
     private String image;
 
+    private LocalDateTime registrationDeadline;
+
+    private LocalDateTime startDate;
+
+    private LocalDateTime endDate;
+
+    @Column(name = "created_date", updatable = false)
+    private LocalDateTime createDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updateDate;
+
     // Relationships to other entities (Venue, Category, Organization)
     @ManyToOne
     @JoinColumn(name = "venue_id")
@@ -58,20 +74,23 @@ public class Event implements Serializable {
     @JoinColumn(name = "organizer_id")
     private Organization organizer;
 
-    // Constructor for creating an Event
-    public Event(String name, boolean registrationRequired, String details, String contactEmail, 
-                 String contactPhoneNumber, String status,  int capacity, String registrationLink, 
-                 String image, Organization organizer, Venue venue) {
+    public Event(String name, String details, boolean registrationRequired, String registrationLink, String contactEmail,
+                 String contactPhoneNumber, String status, int capacity, String image, LocalDateTime registrationDeadline,
+                 LocalDateTime startDate, LocalDateTime endDate, Venue venue, Category category, Organization organizer) {
         this.name = name;
-        this.registrationRequired = registrationRequired;
         this.details = details;
+        this.registrationRequired = registrationRequired;
+        this.registrationLink = registrationLink;
         this.contactEmail = contactEmail;
         this.contactPhoneNumber = contactPhoneNumber;
         this.status = status;
         this.capacity = capacity;
-        this.registrationLink = registrationLink;
         this.image = image;
-        this.organizer = organizer;
+        this.registrationDeadline = registrationDeadline;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.venue = venue;
+        this.category = category;
+        this.organizer = organizer;
     }
 }

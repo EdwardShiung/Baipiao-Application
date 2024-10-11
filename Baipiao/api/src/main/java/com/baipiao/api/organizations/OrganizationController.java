@@ -1,18 +1,23 @@
 package com.baipiao.api.organizations;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 @RestController
 @Tag(name = "Organizations", description = "REST endpoints for managing Organizations")
 public class OrganizationController {
@@ -91,12 +96,9 @@ public class OrganizationController {
                 .map(organizer -> {
                     // Update fields
                     organizer.setName(newOrganization.getName());
-                    organizer.setAddress(newOrganization.getAddress());
                     organizer.setDescription(newOrganization.getDescription());
                     organizer.setEmail(newOrganization.getEmail());
                     organizer.setPhoneno(newOrganization.getPhoneno());
-                    organizer.setWebsite(newOrganization.getWebsite());
-                    organizer.setUpdatedAt(LocalDateTime.now());
                     Organization updatedOrganization = repository.save(organizer);
                     return ResponseEntity.ok(updatedOrganization);
                 })
