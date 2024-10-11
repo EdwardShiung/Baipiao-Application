@@ -6,11 +6,12 @@ import store from './store'
 
 import PaperDashboard from "./plugins/paperDashboard";
 import http from '../src/plugins/http'
-
+import axios from "axios";
 
 Vue.use(PaperDashboard);
 
 Vue.prototype.$http = http;
+Vue.prototype.$axios = axios;
 Vue.config.productionTip = false
 
 

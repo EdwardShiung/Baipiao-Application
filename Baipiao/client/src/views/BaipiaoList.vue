@@ -25,7 +25,6 @@
 </body>
 </template>
 <script>
-import axios from "axios";
 
 export default{
     name:'baipiaolist',
@@ -40,16 +39,17 @@ export default{
     methods: {
       async fetchData() {
           try {
-              const response = await axios.get("http://localhost:8080/events");
-              this.events = response.data; // Assuming the API returns an array of event objects
-              
+              const response = await axios.get("events");
+              // Assuming the API returns an array of event objects
+              this.events = response.data; 
           } catch (error) {
               console.error("Error fetching events:", error);
           }
       },
   },
   created() {
-      this.fetchData(); // Fetch events when the component is created
+    // Fetch events when the component is created
+    this.fetchData(); 
   },
 };
 
