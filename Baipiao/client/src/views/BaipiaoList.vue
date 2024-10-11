@@ -10,19 +10,10 @@
             <span class="addButton">Add</span>
         </div>
     </div>
-
     <div class="todo-body">
-        <ul id="myUL">
+        <ul id="myUL"  v-for="(event, index) in events" :key="event.id">
             <div class="task-bar">
-                <li>Student Branch Chapter at Virginia</li>
-                <span class="task-icon"></span>
-            </div>
-            <div class="task-bar">
-                <li>Amazon Job Event</li>
-                <span class="task-icon"></span>
-            </div>
-            <div class="task-bar">
-                <li>Bloomberg Job Event</li>
+                <li>{{ event.name }}</li>
                 <span class="task-icon"></span>
             </div>
           </ul>
@@ -34,27 +25,33 @@
 </body>
 </template>
 <script>
+import axios from "axios";
+
 export default{
     name:'baipiaolist',
-    data(){
-        return{
-            model:[]
-        }
-    },
-    methods:{
-        async fetchData(){
 
-                const token = localStorage.eleToken
-                console.log(token);
-                const headers = { Authorization: `${token}` }; // 設置HTTP請求header
-                const data = await this.$http.get('/task/taskList', { headers});
-                console.log(data);
-        }
-    },
-    created(){
-
-    },
-}
+    data() {
+      return {
+          statsCards: [
+          ],
+          events: [], // To store the fetched events
+      };
+  },
+    methods: {
+      async fetchData() {
+          try {
+              const response = await axios.get("http://localhost:8080/events");
+              this.events = response.data; // Assuming the API returns an array of event objects
+              
+          } catch (error) {
+              console.error("Error fetching events:", error);
+          }
+      },
+  },
+  created() {
+      this.fetchData(); // Fetch events when the component is created
+  },
+};
 
 </script>
 <style scoped>

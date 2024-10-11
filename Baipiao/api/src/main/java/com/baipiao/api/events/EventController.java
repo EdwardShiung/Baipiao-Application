@@ -1,26 +1,34 @@
 package com.baipiao.api.events;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @Tag(name = "Events", description = "REST endpoints for managing events")
 public class EventController {
 
-    private final EventRepository repository;
+    @Autowired
+    private EventService eventService;
 
     @Autowired
-    public EventController(EventRepository repository) {
-        this.repository = repository;
+    public EventController(EventService eventService) {
+        this.eventService = eventService;
     }
 
     /**
@@ -31,8 +39,8 @@ public class EventController {
     @Operation(summary = "Get all events", description = "Retrieve a list of all events.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of events")
     @GetMapping("/events")
-    public ResponseEntity<List<Event>> getEvents() {
-        List<Event> events = repository.findAll();
+    public ResponseEntity<List<EventDTO>> getEvents() {
+        List<EventDTO> events = eventService.getAllEvents();
         return ResponseEntity.ok(events);
     }
 
@@ -48,8 +56,8 @@ public class EventController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PostMapping("/events")
-    public ResponseEntity<Event> newEvent(@Valid @RequestBody Event newEvent) {
-        Event savedEvent = repository.save(newEvent);
+    public ResponseEntity<EventDTO> newEvent(@Valid @RequestBody Event newEvent) {
+        EventDTO savedEvent = eventService.save(newEvent);
         return ResponseEntity.status(201).body(savedEvent);
     }
 
@@ -65,9 +73,8 @@ public class EventController {
             @ApiResponse(responseCode = "404", description = "Event not found")
     })
     @GetMapping("/events/{id}")
-    public Event one(@Parameter(description = "ID of the event to be retrieved") @PathVariable Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new EventNotFoundException(id));
+    public EventDTO one(@Parameter(description = "ID of the event to be retrieved") @PathVariable Long id) {
+        return eventService.find(id);
     }
 
     /**
@@ -84,28 +91,9 @@ public class EventController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PutMapping("/events/{id}")
-    public ResponseEntity<Event> replaceEvent(@Valid @RequestBody Event newEvent, @PathVariable Long id) {
+    public ResponseEntity<EventDTO> replaceEvent(@Valid @RequestBody Event newEvent, @PathVariable Long id) {
 
-        return repository.findById(id)
-                .map(event -> {
-                    // Update fields
-                    event.setName(newEvent.getName());
-                    event.setRegistrationRequired(newEvent.isRegistrationRequired());
-                    event.setDetails(newEvent.getDetails());
-                    event.setContactEmail(newEvent.getContactEmail());
-                    event.setContactPhoneNumber(newEvent.getContactPhoneNumber());
-                    event.setCapacity(newEvent.getCapacity());
-                    event.setStatus(newEvent.getStatus());
-                    event.setRegistrationLink(newEvent.getRegistrationLink());
-                    Event updatedEvent = repository.save(event);
-                    return ResponseEntity.ok(updatedEvent);
-                })
-                .orElseGet(() -> {
-                    // If event doesn't exist, create a new one
-                    newEvent.setId(id);
-                    Event savedEvent = repository.save(newEvent);
-                    return ResponseEntity.status(201).body(savedEvent);
-                });
+        return ResponseEntity.status(201).body(eventService.save(newEvent));
     }
 
     /**
@@ -119,12 +107,7 @@ public class EventController {
             @ApiResponse(responseCode = "404", description = "Event not found")
     })
     @DeleteMapping("/events/{id}")
-    public ResponseEntity<Object> deleteEvent(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(event -> {
-                    repository.deleteById(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseThrow(() -> new EventNotFoundException(id));
+    public void deleteEvent(@PathVariable Long id) {
+        eventService.deleteById(id);
     }
 }
