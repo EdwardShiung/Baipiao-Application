@@ -4,9 +4,9 @@ import DashboardLayout from '../views/DashboardLayout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import NotFound from '../views/404.vue'
 import LoginAndRegister from '../views/LoginAndRegister.vue'
-import BaipiaoMap from '../views/BaipiaoMap.vue'
-import BaipiaoList from '../views/BaipiaoList.vue'
-
+import BaipiaoUser from '../views/BaipiaoUser.vue'
+// import BaipiaoList from '../views/BaipiaoList.vue'
+import BaipiaoVenue from '@/views/BaipiaoVenue.vue'
 
 
 Vue.use(VueRouter)
@@ -28,15 +28,21 @@ const routes = [
         name: "dashboard",
         component: Dashboard,
       },
+      // Don't Delete!!!!
+      // {
+      //   path: "baipiaolist",
+      //   name: "baipiaolist",
+      //   component: BaipiaoList,
+      // },
       {
-        path: "baipiaolist",
-        name: "baipiaolist",
-        component: BaipiaoList,
+        path: "baipiaouser",
+        name: "baipiaouser",
+        component: BaipiaoUser,
       },
       {
-        path: "baipiaomap",
-        name: "baipiaomap",
-        component: BaipiaoMap,
+        path: "baipiaoVenue",
+        name: "baipiaoVenue",
+        component: BaipiaoVenue,
       },
     ],
   },

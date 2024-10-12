@@ -2,11 +2,15 @@
     <div class="wrapper">
       <side-bar>
         <template slot="links">
-          <sidebar-link to="/dashboard" name="Dashboard" icon="ti-panel" />
-          <sidebar-link to="/baipiaolist" name="Provide Baipiao" icon="ti-view-list-alt" />
+          <sidebar-link to="/" name="Baipiao Events" icon="ti-panel" />
           <sidebar-link
-            to="/baipiaomap"
-            name="Baipiao Map"
+            to="/baipiaouser"
+            name="Baipiao User"
+            icon="ti-map-alt"
+          />
+          <sidebar-link
+            to="/baipiaoVenue"
+            name="Baipiao Venue "
             icon="ti-map-alt"
           />
         </template>

@@ -119,15 +119,13 @@ import jwt_decode from "jwt-decode";
             try {
               this.$http.post('/user/login', this.signInModel).then(res => {
 
-              //登录成功
+
               const { token } = res.data;
               localStorage.setItem("eleToken", token);
 
-              // 解析token
+
               const decode = jwt_decode(token);
 
-              // this.$store.dispatch("setIsAutnenticated", !this.isEmpty(decode));
-              // this.$store.dispatch("setUser", decode);
                 this.$router.push('/');
               })
             } catch (error) {

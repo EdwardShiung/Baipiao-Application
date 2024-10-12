@@ -17,7 +17,7 @@
           </div>
           <div class="numbers" slot="content">
             <p>{{ stats.title }}</p>
-            {{ events.length }}
+            {{ venues.length }}
           </div>
           <div class="stats" slot="footer">
             <i :class="stats.footerIcon"></i> {{ stats.footerText }}
@@ -41,12 +41,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(event, index) in events" :key="event.id">
+            <tr v-for="(event, index) in venues" :key="event.id">
               <th scope="row">{{ index + 1 }}</th>
               <td>{{ event.name }}</td>
               <td>{{ event.location }}</td>
               <td>{{ formatDate(event.startDate) }}</td>
-              <td>{{ event.status }}</td>
+              <td>{{ event.description }}</td>
               <td>
                 <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
                   Delete
@@ -87,7 +87,7 @@
                   type="text"
                   class="form-control"
                   id="eventName"
-                  v-model="newEvent.name"
+                  v-model="newVenue.name"
                   required
                 />
               </div>
@@ -97,7 +97,7 @@
                   type="text"
                   class="form-control"
                   id="eventLocation"
-                  v-model="newEvent.location"
+                  v-model="newVenue.location"
                   required
                 />
               </div>
@@ -107,7 +107,7 @@
                   type="datetime-local"
                   class="form-control"
                   id="eventDate"
-                  v-model="newEvent.startDate"
+                  v-model="newVenue.startDate"
                   required
                 />
               </div>
@@ -116,7 +116,7 @@
                 <select
                   class="form-control"
                   id="eventStatus"
-                  v-model="newEvent.status"
+                  v-model="newVenue.description"
                   required
                 >
                   <option value="upcoming">Upcoming</option>
@@ -158,12 +158,12 @@ export default {
           footerIcon: "ti-reload",
         },
       ],
-      events: [], // To store the fetched events
-      newEvent: {
+      venues: [], // To store the fetched venues
+      newVenue: {
         name: "",
         location: "",
         startDate: "",
-        status: "upcoming",
+        description: "upcoming",
       }, // For storing the new event data from the form
       showModal: false, // To control the visibility of the modal
     };
@@ -171,18 +171,18 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await this.$http.get("events");
-        this.events = response.data;
+        const response = await this.$http.get("venues");
+        this.venues = response.data;
       } catch (error) {
-        console.error("Error fetching events:", error);
+        console.error("Error fetching venues:", error);
       }
     },
     createEvent() {
       // Send the new event to the server
       this.$http
-        .post("events", this.newEvent)
+        .post("venues", this.newVenue)
         .then((response) => {
-          this.events.push(response.data); // Add the new event to the list
+          this.venues.push(response.data); // Add the new event to the list
           this.closeModal(); // Close the modal after creation
           this.resetNewEvent(); // Reset the form
         })
@@ -198,11 +198,11 @@ export default {
     },
     resetNewEvent() {
       // Reset the form fields
-      this.newEvent = {
+      this.newVenue = {
         name: "",
         location: "",
         startDate: "",
-        status: "upcoming",
+        description: "upcoming",
       };
     },
     formatDate(dateString) {
@@ -223,9 +223,9 @@ export default {
       const confirmDelete = confirm("Are you sure you want to delete this event?");
       if (confirmDelete) {
         try {
-          await this.$http.delete(`events/${eventId}`);
+          await this.$http.delete(`venues/${eventId}`);
           // Update the Event Table
-          this.events = this.events.filter(event => event.id !== eventId); 
+          this.venues = this.venues.filter(event => event.id !== eventId); 
         } catch (error) {
           console.error("Error deleting event:", error);
           alert("Delete failed!"); 
@@ -234,7 +234,7 @@ export default {
     },
   },
   created() {
-    this.fetchData(); // Fetch events when the component is created
+    this.fetchData(); // Fetch venues when the component is created
   },
 };
 </script>
