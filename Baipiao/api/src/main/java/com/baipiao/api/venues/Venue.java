@@ -64,4 +64,5 @@ public class Venue {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+    
 }

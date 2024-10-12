@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baipiao.api.events.dtos.EventCreateDTO;
+import com.baipiao.api.events.dtos.EventDTO;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -56,7 +59,7 @@ public class EventController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PostMapping("/events")
-    public ResponseEntity<EventDTO> newEvent(@Valid @RequestBody Event newEvent) {
+    public ResponseEntity<EventDTO> newEvent(@Valid @RequestBody EventCreateDTO newEvent) {
         EventDTO savedEvent = eventService.save(newEvent);
         return ResponseEntity.status(201).body(savedEvent);
     }
@@ -91,7 +94,7 @@ public class EventController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PutMapping("/events/{id}")
-    public ResponseEntity<EventDTO> replaceEvent(@Valid @RequestBody Event newEvent, @PathVariable Long id) {
+    public ResponseEntity<EventDTO> replaceEvent(@Valid @RequestBody EventCreateDTO newEvent, @PathVariable Long id) {
 
         return ResponseEntity.status(201).body(eventService.save(newEvent));
     }
@@ -107,7 +110,12 @@ public class EventController {
             @ApiResponse(responseCode = "404", description = "Event not found")
     })
     @DeleteMapping("/events/{id}")
-    public void deleteEvent(@PathVariable Long id) {
-        eventService.deleteById(id);
+    public ResponseEntity<EventDTO> deleteEvent(@PathVariable Long id) {
+        if(eventService.existsById(id)) {
+            EventDTO event = eventService.deleteById(id);
+            return ResponseEntity.status(204).body(event);
+        }else {
+            return ResponseEntity.notFound().build();
+        }    
     }
 }

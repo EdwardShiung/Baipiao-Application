@@ -2,23 +2,30 @@ package com.baipiao.api.events;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.baipiao.api.categories.Category;
 import com.baipiao.api.organizations.Organization;
+import com.baipiao.api.tickets.Ticket;
 import com.baipiao.api.venues.Venue;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -74,6 +81,10 @@ public class Event implements Serializable {
     @ManyToOne
     @JoinColumn(name = "organizer_id")
     private Organization organizer;
+
+    @ToString.Exclude  // This will exclude the event reference from the toString() method
+    @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Ticket> tickets = new ArrayList<>();
 
     public Event(String name, String details, boolean registrationRequired, String registrationLink, String contactEmail,
                  String contactPhoneNumber, String status, int capacity, String image, LocalDateTime registrationDeadline,

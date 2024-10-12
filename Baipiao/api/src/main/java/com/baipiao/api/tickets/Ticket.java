@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "tickets")
 @IdClass(TicketId.class)
 public class Ticket implements Serializable {
+
     @Id
     @ManyToOne
     @JoinColumn(name = "event_id")
@@ -35,7 +36,6 @@ public class Ticket implements Serializable {
     private LocalDateTime registrationDate;
     private String status;
 
-
     public Ticket(Event event, User user, String ticketNo, LocalDateTime registrationDate, String status) {
         this.event = event;
         this.user = user;
@@ -43,4 +43,5 @@ public class Ticket implements Serializable {
         this.registrationDate = registrationDate;
         this.status = status;
     }
+
 }

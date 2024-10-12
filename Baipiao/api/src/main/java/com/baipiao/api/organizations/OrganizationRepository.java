@@ -1,6 +1,7 @@
 package com.baipiao.api.organizations;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,9 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     // Example for filtering by phone number
     @Query(value = "SELECT * FROM organization WHERE phoneno = :phoneno", nativeQuery = true)
     Organization findByPhoneno(@Param("phoneno") String phoneno);
+
+    @Query(value = "SELECT * FROM organization WHERE id = :id", nativeQuery = true)
+    @Override
+    public Optional<Organization> findById(Long id);
+
 }
