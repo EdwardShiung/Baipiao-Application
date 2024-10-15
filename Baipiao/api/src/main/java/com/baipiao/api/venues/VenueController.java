@@ -10,19 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.baipiao.api.venues.dto.VenueCreateDTO;
+import com.baipiao.api.venues.dto.VenueDTO;
+
 import java.util.List;
 
 @RestController
 @Tag(name = "Venues", description = "REST endpoints for managing venues")
 public class VenueController {
 
-    private final VenueRepository repository;
-
     @Autowired
-    public VenueController(VenueRepository repository) {
-        this.repository = repository;
-    }
+    private final VenueService venueService;
 
+    public VenueController(VenueService venueService) {
+        this.venueService = venueService;
+    }
     /**
      * Retrieve a list of all venues.
      *
@@ -31,15 +33,16 @@ public class VenueController {
     @Operation(summary = "Get all venues", description = "Retrieve a list of all venues.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of venues")
     @GetMapping("/venues")
-    public ResponseEntity<List<Venue>> all() {
-        List<Venue> venues = repository.findAll();
+    public ResponseEntity<List<VenueDTO>> all() {
+        List<VenueDTO> venues = venueService.getAll();
         return ResponseEntity.ok(venues);
     }
 
     /**
      * Add a new venue to the repository.
      *
-     * @param newVenue Venue object containing the details of the new venue.
+     * @param newVenue Venue object containing the details of the new
+     *                    venue.
      * @return The saved Venue object.
      */
     @Operation(summary = "Create a new venue", description = "Create and save a new venue with the provided details.")
@@ -48,9 +51,9 @@ public class VenueController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PostMapping("/venues")
-    public ResponseEntity<Venue> newVenue(@Valid @RequestBody Venue newVenue) {
-        Venue savedVenue = repository.save(newVenue);
-        return ResponseEntity.status(201).body(savedVenue);
+    public ResponseEntity<Void> newVenue(@Valid @RequestBody VenueCreateDTO newVenue) {
+        venueService.save(newVenue);
+        return ResponseEntity.status(201).build();
     }
 
     /**
@@ -65,42 +68,41 @@ public class VenueController {
             @ApiResponse(responseCode = "404", description = "Venue not found")
     })
     @GetMapping("/venues/{id}")
-    public Venue one(@Parameter(description = "ID of the venue to be retrieved") @PathVariable Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new VenueNotFoundException(id));
+    public ResponseEntity<VenueDTO> one(
+            @Parameter(description = "ID of the venue to be retrieved") @PathVariable Long id) {
+
+        VenueDTO venue = venueService.find(id);
+
+        if (venue == null) {
+            throw new VenueNotFoundException(id); // Throw the exception instead of returning it
+        } else {
+            return ResponseEntity.ok(venue); // Properly build the response entity with the body
+        }
     }
 
     /**
-     * Update an existing venue or create a new one if the specified venue ID doesn't exist.
+     * Update an existing venue or create a new one if the specified venue ID
+     * doesn't exist.
      *
      * @param newVenue Venue object containing updated details.
-     * @param id ID of the venue to be updated.
+     * @param id          ID of the venue to be updated.
      * @return The updated or newly created Venue object.
      */
     @Operation(summary = "Update an existing venue", description = "Update the details of an existing venue or create a new one if it doesn't exist.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Venue successfully updated"),
-            @ApiResponse(responseCode = "201", description = "Venue created as it did not exist"),
-            @ApiResponse(responseCode = "400", description = "Invalid request")
+            // @ApiResponse(responseCode = "201", description = "Venue created as it did
+            // not exist"),
+            // @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "404", description = "Venue not found")
     })
     @PutMapping("/venues/{id}")
-    public ResponseEntity<Venue> replaceVenue(@Valid @RequestBody Venue newVenue, @PathVariable Long id) {
-        return repository.findById(id)
-                .map(venue -> {
-                    // Update fields
-                    venue.setName(newVenue.getName());
-                    venue.setDescription(newVenue.getDescription());
-                    venue.setLocation(newVenue.getLocation());
-                    venue.setUpdatedAt(newVenue.getUpdatedAt());
-                    Venue updatedVenue = repository.save(venue);
-                    return ResponseEntity.ok(updatedVenue);
-                })
-                .orElseGet(() -> {
-                    // If venue doesn't exist, create a new one
-                    newVenue.setId(id);
-                    Venue savedVenue = repository.save(newVenue);
-                    return ResponseEntity.status(201).body(savedVenue);
-                });
+    public ResponseEntity<Void> replaceVenue(
+            @Valid @RequestBody VenueCreateDTO newVenue,
+            @PathVariable Long id) {
+
+        venueService.update(newVenue, id);
+        return ResponseEntity.ok().build(); // Return 200 OK with the updated venue
     }
 
     /**
@@ -114,12 +116,8 @@ public class VenueController {
             @ApiResponse(responseCode = "404", description = "Venue not found")
     })
     @DeleteMapping("/venues/{id}")
-    public ResponseEntity<Object> deleteVenue(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(venue -> {
-                    repository.deleteById(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseThrow(() -> new VenueNotFoundException(id));
+    public ResponseEntity<Void> deleteVenue(@PathVariable Long id) {
+        venueService.deleteById(id);
+        return ResponseEntity.status(204).build();
     }
 }

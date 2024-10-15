@@ -1,36 +1,50 @@
 package com.baipiao.api.organizations;
 
 import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import org.locationtech.jts.geom.Point;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
 
-    @Override
-    @Query(value = "SELECT * FROM organization", nativeQuery = true)
-    List<Organization> findAll();
+    // Read: Retrieve all organizations
+    @Query(value = "SELECT * FROM organizations", nativeQuery = true)
+    List<Organization> findAllOrganizations();
 
-    // Example for filtering by name
-    @Query(value = "SELECT * FROM organization WHERE name LIKE %:name%", nativeQuery = true)
-    List<Organization> findByNameContaining(@Param("name") String name);
+    // Read: Retrieve a organization by its ID
+    @Query(value = "SELECT * FROM organizations WHERE id = :id", nativeQuery = true)
+    Organization findOrganizationById(@Param("id") Long id);
 
-    // Example for filtering by email
-    @Query(value = "SELECT * FROM organization WHERE email = :email", nativeQuery = true)
-    Organization findByEmail(@Param("email") String email);
+    // Read: Retrieve a organization by its name
+    @Query(value = "SELECT * FROM organizations WHERE name = :name", nativeQuery = true)
+    Organization findOrganizationByName(@Param("name") String name);
 
-    // Example for filtering by address
-    @Query(value = "SELECT * FROM organization WHERE address LIKE %:address%", nativeQuery = true)
-    List<Organization> findByAddressContaining(@Param("address") String address);
+    // Create: Insert a new organization (not typically done in a repository, but here's a
+    // native query version)
+    // Create: Insert a new organization
+    @Modifying
+    @Transactional
 
-    // Example for filtering by phone number
-    @Query(value = "SELECT * FROM organization WHERE phoneno = :phoneno", nativeQuery = true)
-    Organization findByPhoneno(@Param("phoneno") String phoneno);
+    @Query(value = "INSERT INTO organizations (name, description, email, phoneno) VALUES (:name, :description, :email, :phoneno )", nativeQuery = true)
+    void insertOrganization(@Param("name") String name, @Param("description") String description, @Param("email") String email, @Param("phoneno") String phoneno);
 
-    @Query(value = "SELECT * FROM organization WHERE id = :id", nativeQuery = true)
-    @Override
-    public Optional<Organization> findById(Long id);
+    // Update: Update a organization by its ID
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE organizations SET name = :name, description = :description , email = :email, phoneno = :phoneno WHERE id = :id", nativeQuery = true)
+    void updateOrganization(@Param("id") Long id, @Param("name") String name, @Param("description") String description, @Param("email") String email, @Param("phoneno") String phoneno);
+
+    // Delete: Delete a organization by its ID
+    @Modifying
+    @Transactional
+    // @Query(value = "DELETE FROM organizations WHERE id = :id", nativeQuery = true)
+    void deleteOrganizationById(@Param("id") Long id);
 
 }

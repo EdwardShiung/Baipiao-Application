@@ -88,7 +88,9 @@ public class LoadDatabase {
                     -80.4200 + (random.nextDouble() * 0.02),  // Longitude
                     37.2300 + (random.nextDouble() * 0.02)   // Latitude
                 ));
-                Venue venue = new Venue(venueName, "Description of " + venueName, location);
+                User createdBy =  users.get(random.nextInt(users.size()));
+                User updatedBy =  users.get(random.nextInt(users.size()));
+                Venue venue = new Venue(venueName, "Description of " + venueName, location, createdBy, updatedBy);
                 venues.add(venue);
                 log.info("Preloading " + venueRepository.save(venue));
             }

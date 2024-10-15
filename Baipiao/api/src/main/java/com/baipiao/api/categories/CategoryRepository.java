@@ -37,6 +37,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     // Delete: Delete a category by its ID
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM categories WHERE id = :id", nativeQuery = true)
+    // @Query(value = "DELETE FROM categories WHERE id = :id", nativeQuery = true)
     void deleteCategoryById(@Param("id") Long id);
+
 }

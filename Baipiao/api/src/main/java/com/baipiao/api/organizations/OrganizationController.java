@@ -1,132 +1,123 @@
 package com.baipiao.api.organizations;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.baipiao.api.organizations.dto.OrganizationCreateDTO;
+import com.baipiao.api.organizations.dto.OrganizationDTO;
+
+import java.util.List;
+
 @RestController
-@Tag(name = "Organizations", description = "REST endpoints for managing Organizations")
+@Tag(name = "Organizations", description = "REST endpoints for managing organizations")
 public class OrganizationController {
 
-    private final OrganizationRepository repository;
-
     @Autowired
-    public OrganizationController(OrganizationRepository repository) {
-        this.repository = repository;
-    }
+    private final OrganizationService organizationService;
 
+    public OrganizationController(OrganizationService organizationService) {
+        this.organizationService = organizationService;
+    }
     /**
-     * Retrieve a list of all organizers.
+     * Retrieve a list of all organizations.
      *
-     * @return List of all organizers in the repository.
+     * @return List of all organizations in the repository.
      */
-    @Operation(summary = "Get all organizers", description = "Retrieve a list of all organizers.")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of organizers")
-    @GetMapping("/organizers")
-    public ResponseEntity<List<Organization>> all() {
-        List<Organization> organizers = repository.findAll();
-        return ResponseEntity.ok(organizers);
+    @Operation(summary = "Get all organizations", description = "Retrieve a list of all organizations.")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of organizations")
+    @GetMapping("/organizations")
+    public ResponseEntity<List<OrganizationDTO>> all() {
+        List<OrganizationDTO> organizations = organizationService.getAll();
+        return ResponseEntity.ok(organizations);
     }
 
     /**
-     * Add a new organizer to the repository.
+     * Add a new organization to the repository.
      *
-     * @param newOrganization Organization object containing the details of the new organizer.
+     * @param newOrganization Organization object containing the details of the new
+     *                    organization.
      * @return The saved Organization object.
      */
-    @Operation(summary = "Create a new organizer", description = "Create and save a new organizer with the provided details.")
+    @Operation(summary = "Create a new organization", description = "Create and save a new organization with the provided details.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Organization successfully created"),
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
-    @PostMapping("/organizers")
-    public ResponseEntity<Organization> newOrganization(@Valid @RequestBody Organization newOrganization) {
-        Organization savedOrganization = repository.save(newOrganization);
-        return ResponseEntity.status(201).body(savedOrganization);
+    @PostMapping("/organizations")
+    public ResponseEntity<Void> newOrganization(@Valid @RequestBody OrganizationCreateDTO newOrganization) {
+        organizationService.save(newOrganization);
+        return ResponseEntity.status(201).build();
     }
 
     /**
-     * Retrieve a specific organizer by providing its ID.
+     * Retrieve a specific organization by providing its ID.
      *
-     * @param id ID of the organizer to be retrieved.
+     * @param id ID of the organization to be retrieved.
      * @return The Organization object with the specified ID.
      */
-    @Operation(summary = "Get an organizer by ID", description = "Retrieve a specific organizer by providing its ID.")
+    @Operation(summary = "Get a organization by ID", description = "Retrieve a specific organization by providing its ID.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the organizer"),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the organization"),
             @ApiResponse(responseCode = "404", description = "Organization not found")
     })
-    @GetMapping("/organizers/{id}")
-    public Organization one(@Parameter(description = "ID of the organizer to be retrieved") @PathVariable Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new OrganizationNotFoundException(id));
+    @GetMapping("/organizations/{id}")
+    public ResponseEntity<OrganizationDTO> one(
+            @Parameter(description = "ID of the organization to be retrieved") @PathVariable Long id) {
+
+        OrganizationDTO organization = organizationService.find(id);
+
+        if (organization == null) {
+            throw new OrganizationNotFoundException(id); // Throw the exception instead of returning it
+        } else {
+            return ResponseEntity.ok(organization); // Properly build the response entity with the body
+        }
     }
 
     /**
-     * Update an existing organizer or create a new one if the specified organizer ID doesn't exist.
+     * Update an existing organization or create a new one if the specified organization ID
+     * doesn't exist.
      *
      * @param newOrganization Organization object containing updated details.
-     * @param id ID of the organizer to be updated.
+     * @param id          ID of the organization to be updated.
      * @return The updated or newly created Organization object.
      */
-    @Operation(summary = "Update an existing organizer", description = "Update the details of an existing organizer or create a new one if it doesn't exist.")
+    @Operation(summary = "Update an existing organization", description = "Update the details of an existing organization or create a new one if it doesn't exist.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Organization successfully updated"),
-            @ApiResponse(responseCode = "201", description = "Organization created as it did not exist"),
-            @ApiResponse(responseCode = "400", description = "Invalid request")
+            // @ApiResponse(responseCode = "201", description = "Organization created as it did
+            // not exist"),
+            // @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "404", description = "Organization not found")
     })
-    @PutMapping("/organizers/{id}")
-    public ResponseEntity<Organization> replaceOrganization(@Valid @RequestBody Organization newOrganization, @PathVariable Long id) {
+    @PutMapping("/organizations/{id}")
+    public ResponseEntity<Void> replaceOrganization(
+            @Valid @RequestBody OrganizationCreateDTO newOrganization,
+            @PathVariable Long id) {
 
-        return repository.findById(id)
-                .map(organizer -> {
-                    // Update fields
-                    organizer.setName(newOrganization.getName());
-                    organizer.setDescription(newOrganization.getDescription());
-                    organizer.setEmail(newOrganization.getEmail());
-                    organizer.setPhoneno(newOrganization.getPhoneno());
-                    Organization updatedOrganization = repository.save(organizer);
-                    return ResponseEntity.ok(updatedOrganization);
-                })
-                .orElseGet(() -> {
-                    // If organizer doesn't exist, create a new one
-                    newOrganization.setId(id);
-                    Organization savedOrganization = repository.save(newOrganization);
-                    return ResponseEntity.status(201).body(savedOrganization);
-                });
+        organizationService.update(newOrganization, id);
+        return ResponseEntity.ok().build(); // Return 200 OK with the updated organization
     }
 
     /**
-     * Delete an organizer by ID.
+     * Delete a organization by ID.
      *
-     * @param id ID of the organizer to be deleted.
+     * @param id ID of the organization to be deleted.
      */
-    @Operation(summary = "Delete an organizer", description = "Delete an organizer by providing its ID.")
+    @Operation(summary = "Delete a organization", description = "Delete a organization by providing its ID.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Organization successfully deleted"),
             @ApiResponse(responseCode = "404", description = "Organization not found")
     })
-    @DeleteMapping("/organizers/{id}")
-    public ResponseEntity<Object> deleteOrganization(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(organizer -> {
-                    repository.deleteById(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseThrow(() -> new OrganizationNotFoundException(id));
+    @DeleteMapping("/organizations/{id}")
+    public ResponseEntity<Void> deleteOrganization(@PathVariable Long id) {
+        organizationService.deleteById(id);
+        return ResponseEntity.status(204).build();
     }
 }

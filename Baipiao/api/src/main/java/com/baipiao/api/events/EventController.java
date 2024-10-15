@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baipiao.api.events.dtos.EventCreateDTO;
-import com.baipiao.api.events.dtos.EventDTO;
+import com.baipiao.api.events.dto.EventDTO;
+import com.baipiao.api.events.dto.EventCreateDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -61,7 +61,12 @@ public class EventController {
     @PostMapping("/events")
     public ResponseEntity<EventDTO> newEvent(@Valid @RequestBody EventCreateDTO newEvent) {
         EventDTO savedEvent = eventService.save(newEvent);
-        return ResponseEntity.status(201).body(savedEvent);
+        if (savedEvent==null) {
+            return ResponseEntity.notFound().build();
+        }else {
+            return ResponseEntity.status(201).body(savedEvent);    
+        }
+        
     }
 
     /**
@@ -76,8 +81,14 @@ public class EventController {
             @ApiResponse(responseCode = "404", description = "Event not found")
     })
     @GetMapping("/events/{id}")
-    public EventDTO one(@Parameter(description = "ID of the event to be retrieved") @PathVariable Long id) {
-        return eventService.find(id);
+    public ResponseEntity<EventDTO> one(@Parameter(description = "ID of the event to be retrieved") @PathVariable Long id) {
+        EventDTO event = eventService.find(id);
+
+        if (event == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok().body(event); // Properly build the response entity with the body
+        }   
     }
 
     /**

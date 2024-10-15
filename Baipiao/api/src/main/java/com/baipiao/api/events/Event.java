@@ -9,6 +9,7 @@ import com.baipiao.api.categories.Category;
 import com.baipiao.api.organizations.Organization;
 import com.baipiao.api.tickets.Ticket;
 import com.baipiao.api.venues.Venue;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -69,17 +70,13 @@ public class Event implements Serializable {
     @Column(name = "updated_date")
     private LocalDateTime updateDate;
 
-    // Relationships to other entities (Venue, Category, Organization)
-    @ManyToOne
-    @JoinColumn(name = "venue_id")
+    @ManyToOne(fetch = FetchType.EAGER)
     private Venue venue;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     private Category category;
-
-    @ManyToOne
-    @JoinColumn(name = "organizer_id")
+    
+    @ManyToOne(fetch = FetchType.EAGER)
     private Organization organizer;
 
     @ToString.Exclude  // This will exclude the event reference from the toString() method

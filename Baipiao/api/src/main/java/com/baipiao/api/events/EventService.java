@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baipiao.api.categories.CategoryRepository;
-import com.baipiao.api.events.dtos.EventCreateDTO;
-import com.baipiao.api.events.dtos.EventDTO;
 import com.baipiao.api.organizations.OrganizationRepository;
 import com.baipiao.api.venues.VenueRepository;
 
 import jakarta.transaction.Transactional;
+import com.baipiao.api.events.dto.EventDTO;
+import com.baipiao.api.events.dto.EventCreateDTO;
 
 @Service
 public class EventService {
@@ -24,6 +24,7 @@ public class EventService {
     private CategoryRepository categoryRepository;
     @Autowired
     private OrganizationRepository organizationRepository;
+
     public List<EventDTO> getAllEvents() {
         return eventRepository.findAll().stream().map(event -> {
             return new EventDTO(event);

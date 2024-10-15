@@ -14,8 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baipiao.api.events.EventNotFoundException;
 import com.baipiao.api.events.EventRepository;
+import com.baipiao.api.events.EventService;
+import com.baipiao.api.tickets.dto.TicketCreateDTO;
+import com.baipiao.api.tickets.dto.TicketDTO;
 import com.baipiao.api.users.UserNotFoundException;
 import com.baipiao.api.users.UserRepository;
+import com.baipiao.api.users.UserService;
+import com.baipiao.api.users.dto.UserCreateDTO;
+import com.baipiao.api.users.dto.UserDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,17 +34,12 @@ import jakarta.validation.Valid;
 @Tag(name = "Tickets", description = "REST endpoints for managing Tickets")
 public class TicketController {
 
-    private final TicketRepository repository;
-    private final EventRepository eventRepository;
-    private final UserRepository userRepository;
+    private final TicketService ticketService;
 
     @Autowired
-    public TicketController(TicketRepository repository, EventRepository eventRepository, UserRepository userRepository) {
-        this.repository = repository;
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
     }
-
     /**
      * Retrieve a list of all tickets.
      *
@@ -47,10 +48,67 @@ public class TicketController {
     @Operation(summary = "Get all tickets", description = "Retrieve a list of all tickets.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of tickets")
     @GetMapping("/tickets")
-    public ResponseEntity<List<Ticket>> all() {
-        List<Ticket> tickets = repository.findAll();
+    public ResponseEntity<List<TicketDTO>> all() {
+        List<TicketDTO> tickets = ticketService.findAll();
         return ResponseEntity.ok(tickets);
     }
+     /**
+     * Retrieve tickets for a specific eventby providing its event ID.
+     *
+     * @param eventId ID of the event to be retrieved.
+     * @return All Ticket objects with the specified event ID.
+     */
+    @Operation(summary = "Get all ticket by event ID", description = "Retrieve a specific ticket by providing its ID.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the ticket"),
+            @ApiResponse(responseCode = "404", description = "Ticket not found")
+    })
+    @GetMapping("/tickets/event/{eventId}")
+    public List<TicketDTO> findByEvent(@Parameter(description = "ID of the ticket to be retrieved") @PathVariable Long eventId) {
+        return ticketService.findByEvent(eventId);
+    }
+
+
+    /**
+     * Retrieve tickets for a specific user by providing its user  ID.
+     *
+     * @param userId ID of the user to be retrieved.
+     * @return All Ticket objects with the specified user ID.
+     */
+    @Operation(summary = "Get all ticket by user+ ID", description = "Retrieve tickets for a specific user by providing its user ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the ticket"),
+            @ApiResponse(responseCode = "404", description = "Ticket not found")
+    })
+    @GetMapping("/tickets/user/{userId}")
+    public List<TicketDTO> findByUser(@Parameter(description = "userId of the ticket to be retrieved") @PathVariable Long userId) {
+        return ticketService.findByUser(userId);
+    }
+
+
+
+    /**
+     * Retrieve tickets for a specific user by providing its user  ID.
+     *
+     * @param eventId ID of the user to be retrieved.
+     * @param userId ID of the user to be retrieved.
+     * @return All Ticket objects with the specified user ID.
+     */
+    @Operation(summary = "Get a specific ticket by user ID and event ID", description = "Retrieve a tickets for a specific user and event ")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the ticket"),
+            @ApiResponse(responseCode = "404", description = "Ticket not found")
+    })
+    @GetMapping("/tickets/event/{eventId}/user/{userId}")
+    public ResponseEntity<TicketDTO> findTicekt(@Parameter(description = "userId of the ticket to be retrieved") @PathVariable Long userId, @Parameter(description = "eventId of the ticket to be retrieved") @PathVariable Long eventId) {
+        TicketDTO ticket = ticketService.find(eventId,userId);
+        if (ticket == null) {
+            return ResponseEntity.status(404).build();
+        } else {
+            return ResponseEntity.ok(ticket); // Properly build the response entity with the body
+        }
+    }
+
 
     /**
      * Add a new ticket to the repository.
@@ -64,27 +122,12 @@ public class TicketController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PostMapping("/tickets")
-    public ResponseEntity<Ticket> newTicket(@Valid @RequestBody Ticket newTicket) {
-        Ticket savedTicket = repository.save(newTicket);
-        return ResponseEntity.status(201).body(savedTicket);
+    public ResponseEntity<Void> newTicket(@Valid @RequestBody TicketCreateDTO newTicket) {
+        ticketService.save(newTicket);
+        return ResponseEntity.status(201).build();
     }
 
-    /**
-     * Retrieve a specific ticket by providing its ID.
-     *
-     * @param id ID of the ticket to be retrieved.
-     * @return The Ticket object with the specified ID.
-     */
-    @Operation(summary = "Get a ticket by ID", description = "Retrieve a specific ticket by providing its ID.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved the ticket"),
-            @ApiResponse(responseCode = "404", description = "Ticket not found")
-    })
-    @GetMapping("/tickets/{id}")
-    public Ticket one(@Parameter(description = "ID of the ticket to be retrieved") @PathVariable Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new TicketNotFoundException(id));
-    }
+   
 
     /**
      * Update an existing ticket or create a new one if the specified ticket ID doesn't exist.
@@ -99,30 +142,12 @@ public class TicketController {
             @ApiResponse(responseCode = "201", description = "Ticket created as it did not exist"),
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
-    @PutMapping("/tickets/{event_id}/{user_id}")
-    public ResponseEntity<Ticket> replaceTicket(@Valid @RequestBody Ticket newTicket, @PathVariable Long user_id, @PathVariable Long event_id) {
+    @PutMapping("/tickets/event/{eventId}/user/{userId}")
+    public ResponseEntity<Void> replaceTicket(@Valid @RequestBody TicketCreateDTO newTicket, @PathVariable Long userId, @PathVariable Long eventId) {
     
-        
-        return repository.findByUserAndEvent(user_id, event_id)
-                .map(ticket -> {
-                    // Update fields from the provided newTicket object
-                    ticket.setEvent(newTicket.getEvent());
-                    ticket.setRegistrationDate(newTicket.getRegistrationDate());
-                    ticket.setStatus(newTicket.getStatus());
-                    ticket.setTicketNo(newTicket.getTicketNo());
-                    ticket.setUser(newTicket.getUser());
-                    
-                    Ticket updatedTicket = repository.save(ticket); // Save the updated ticket
-                    return ResponseEntity.ok(updatedTicket);
-                })
-                .orElseGet(() -> {
-                    // If ticket doesn't exist, create a new one
-                    newTicket.setUser(userRepository.findById(user_id).orElseThrow(() -> new UserNotFoundException(user_id))); 
-                    newTicket.setEvent(eventRepository.findById(event_id).orElseThrow(() -> new EventNotFoundException(event_id)));
-                    
-                    Ticket savedTicket = repository.save(newTicket); // Save the new ticket
-                    return ResponseEntity.status(201).body(savedTicket);
-                });
+        ticketService.update(newTicket, eventId, userId); // Save the updated ticket
+        return ResponseEntity.ok().build(); 
+
     }
     /**
      * Delete a ticket by ID.
@@ -134,13 +159,10 @@ public class TicketController {
             @ApiResponse(responseCode = "204", description = "Ticket successfully deleted"),
             @ApiResponse(responseCode = "404", description = "Ticket not found")
     })
-    @DeleteMapping("/tickets/{id}")
-    public ResponseEntity<Object> deleteTicket(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(ticket -> {
-                    repository.deleteById(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseThrow(() -> new TicketNotFoundException(id));
+    @DeleteMapping("/tickets/event/{eventId}/user/{userId}")
+    public ResponseEntity<Void> deleteTicket(@PathVariable Long userId, @PathVariable Long eventId) {
+        ticketService.deleteTicket(eventId, userId);
+        return ResponseEntity.status(204).build();
+
     }
 }
