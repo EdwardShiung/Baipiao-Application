@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import com.baipiao.api.users.User;
 import lombok.Data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class UserCreateDTO implements Serializable {
   private Long id;
