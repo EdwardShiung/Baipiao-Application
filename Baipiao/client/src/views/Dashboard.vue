@@ -84,7 +84,7 @@
           </div>
           <div class="modal-body">
             <!-- Form for creating event -->
-            <form @submit.prevent="createEvent">
+            <form>
               <div class="form-group">
                 <label for="eventName">Event Name</label>
                 <input
@@ -362,7 +362,6 @@ export default {
       this.$http
         .put(`events/${this.currentEvent.id}`, this.currentEvent)
         .then((response) => {
-          this.events.push(response.data); // Add the new event to the list
           this.closeModal(); // Close the modal after creation
           this.resetNewEvent(); // Reset the form
           this.fetchData();
