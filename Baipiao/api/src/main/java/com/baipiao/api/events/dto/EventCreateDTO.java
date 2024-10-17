@@ -2,11 +2,17 @@ package com.baipiao.api.events.dto;
 
 import java.time.LocalDateTime;
 
+import com.baipiao.api.config.CustomLocalDateTimeDeserializer;
+import com.baipiao.api.config.CustomLocalDateTimeSerializer;
 import com.baipiao.api.events.Event;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Data;
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventCreateDTO{
     private Long id;
     private String name;
@@ -18,17 +24,20 @@ public class EventCreateDTO{
     private String status;
     private int capacity;
     private String image;
-    private Long venue;
-    private Long category;
-    private Long organizer;
+    private Long venueId;
+    private Long categoryId;
+    private Long organizerId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime registrationDeadline;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime startDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime endDate;
 
     public EventCreateDTO() {
@@ -44,9 +53,9 @@ public class EventCreateDTO{
         this.status = event.getStatus();
         this.capacity = event.getCapacity();
         this.image = event.getImage();
-        this.venue = event.getVenue().getId();
-        this.category = event.getCategory().getId();
-        this.organizer = event.getOrganizer().getId();
+        this.venueId = event.getVenue().getId();
+        this.categoryId = event.getCategory().getId();
+        this.organizerId = event.getOrganizer().getId();
         this.registrationDeadline = event.getRegistrationDeadline();
         this.startDate = event.getStartDate();
         this.endDate = event.getEndDate();

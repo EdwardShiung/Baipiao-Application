@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.tools.JavaFileManager.Location;
 
+import com.baipiao.api.config.CustomLocalDateTimeDeserializer;
+import com.baipiao.api.config.CustomLocalDateTimeSerializer;
 import com.baipiao.api.events.Event;
 import com.baipiao.api.venues.PointDeserializer;
 import com.baipiao.api.venues.PointSerializer;
@@ -31,14 +33,21 @@ public class EventDTO{
     private Point location;
     private String category;
     private String organizer;
+    private Long categoryId;
+    private Long organizerId;
+    private Long venueId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+
     private LocalDateTime registrationDeadline;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime startDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime endDate;
 
     public EventDTO(Event event) {
@@ -59,6 +68,9 @@ public class EventDTO{
         this.registrationDeadline = event.getRegistrationDeadline();
         this.startDate = event.getStartDate();
         this.endDate = event.getEndDate();
+        this.categoryId = event.getCategory().getId();
+        this.organizerId = event.getOrganizer().getId();
+        this.venueId = event.getVenue().getId();
     }
 
     

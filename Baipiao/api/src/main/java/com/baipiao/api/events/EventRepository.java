@@ -29,17 +29,58 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // Create: Insert a new event (not typically done in a repository, but here's a
     // native query version)
     // Create: Insert a new event
+    /**
+     * name, details, registrationRequired, registrationLink, contactEmail,
+     * contactPhoneNumber, status;
+     * private int capacity, image, venue, location, category, organizer,
+     * categoryId, organizerId;
+     * private Long venueId;
+     * 
+     */
     @Modifying
     @Transactional
-
-    @Query(value = "INSERT INTO events (email, eventname, password, phone_number, display_name, event_type, created_at) VALUES (:email, :eventname, :password, :phone_number, :display_name, :event_type, :created_at)", nativeQuery = true)
-    void insertEvent(@Param("email") String name, @Param("eventname") String description, @Param("password") String password, @Param("phone_number") String phone_number, @Param("display_name") String displayName,  @Param("event_type") String eventType, @Param("created_at") LocalDateTime createdAt);
+    @Query(value = "INSERT INTO events (name, details, registration_required, registration_link, contact_email, contact_phone_number, status, capacity, image, registration_deadline, start_date, end_date, created_date, venue_id, category_id, organizer_id) " +
+            "VALUES (:name, :details, :registrationRequired, :registrationLink, :contactEmail, :contactPhoneNumber, :status, :capacity, :image, :registrationDeadline, :startDate, :endDate, :createDate, :venueId, :categoryId, :organizerId)", nativeQuery = true)
+    void insertEvent(
+        @Param("name") String name,
+        @Param("details") String details,
+        @Param("registrationRequired") Boolean registrationRequired,
+        @Param("registrationLink") String registrationLink,
+        @Param("contactEmail") String contactEmail,
+        @Param("contactPhoneNumber") String contactPhoneNumber,
+        @Param("status") String status,
+        @Param("capacity") Integer capacity,
+        @Param("image") String image,
+        @Param("registrationDeadline") LocalDateTime registrationDeadline,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        @Param("createDate") LocalDateTime createDate,
+        @Param("venueId") Long venueId,
+        @Param("categoryId") Long categoryId,
+        @Param("organizerId") Long organizerId);
 
     // Update: Update a event by its ID
     @Modifying
     @Transactional
-    @Query(value = "UPDATE events SET email = :email, eventname = :eventname , display_name = :display_name, password = :password, phone_number = :phone_number, event_type= :event_type, created_at = :created_at WHERE id = :id", nativeQuery = true)
-    void updateEvent(@Param("id") Long id, @Param("email") String name, @Param("eventname") String description, @Param("password") String password, @Param("phone_number") String phone_number, @Param("display_name") String displayName,  @Param("event_type") String eventType, @Param("created_at") LocalDateTime createdAt);
+    @Query(value = "UPDATE events SET name = :name, details = :details, registration_required = :registrationRequired, registration_link = :registrationLink, contact_email = :contactEmail, contact_phone_number = :contactPhoneNumber, status = :status, capacity = :capacity, image = :image, registration_deadline = :registrationDeadline, start_date = :startDate, end_date = :endDate, venue_id = :venueId, category_id = :categoryId, organizer_id = :organizerId WHERE id = :id", nativeQuery = true)
+    void updateEvent(
+        @Param("id") Long id, // The event ID to update
+        @Param("name") String name,
+        @Param("details") String details,
+        @Param("registrationRequired") Boolean registrationRequired,
+        @Param("registrationLink") String registrationLink,
+        @Param("contactEmail") String contactEmail,
+        @Param("contactPhoneNumber") String contactPhoneNumber,
+        @Param("status") String status,
+        @Param("capacity") Integer capacity,
+        @Param("image") String image,
+        @Param("registrationDeadline") LocalDateTime registrationDeadline,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        @Param("venueId") Long venueId,
+        @Param("categoryId") Long categoryId,
+        @Param("organizerId") Long organizerId
+    );
 
     // Delete: Delete a event by its ID
     @Modifying

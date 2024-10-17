@@ -45,7 +45,7 @@
               <th scope="row">{{ index + 1 }}</th>
               <td>{{ event.name }}</td>
               <td>{{ event.venue }}</td>
-              <td>{{ formatDate(event.startDate)}}</td>
+              <td>{{ event.startDate }}</td>
               <td>{{ event.status }}</td>
               <td>
                 <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
@@ -104,23 +104,13 @@
                   rows="3"
                   required>{{currentEvent.details}}</textarea>
               </div>
-              <!-- <div class="form-group">
-                <label for="eventLocation">Location</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="eventLocation"
-                  v-model="currentEvent.location"
-                  required
-                />
-              </div> -->
               <div class="form-group">
                 <label for="startDate">Start Date</label>
                 <input
                   type="datetime-local"
                   class="form-control"
                   id="startDate"
-                  v-model="currentEvent.startDate"
+                  v-model="formattedStartDate"
                   required
                 />
               </div>
@@ -130,12 +120,13 @@
                   type="datetime-local"
                   class="form-control"
                   id="endDate"
-                  v-model="currentEvent.endDate"
+                  v-model="formattedEndDate"
                   required
                 />
               </div>
               <div class="form-group toggle-container">
-                <label for="registrationRequired" class="toggle-label">Registration Required</label>
+              <label for="registrationRequired" class="toggle-label">Registration Required</label> &nbsp; &nbsp;
+              <label class="switch">
                 <input
                   type="checkbox"
                   id="registrationRequired"
@@ -143,8 +134,9 @@
                   class="toggle-checkbox"
                 />
                 <span class="slider"></span>
-              </div>
-              <div class="form-group">
+              </label>
+            </div>
+              <div class="form-group" v-if="currentEvent.registrationRequired">
                 <label for="registrationLink">Registration Link</label>
                 <input
                   type="text"
@@ -154,23 +146,13 @@
                   required
                 />
               </div>
-              <div class="form-group">
+              <div class="form-group" v-if="currentEvent.registrationRequired">
                 <label for="registrationDeadline">Registration Deadline</label>
                 <input
                   type="datetime-local"
                   class="form-control"
                   id="registrationDeadline"
-                  v-model="currentEvent.registrationDeadline"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="contactEmail">Contact Email</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="contactEmail"
-                  v-model="currentEvent.contactEmail"
+                  v-model="formattedRegistrationDeadline"
                   required
                 />
               </div>
@@ -214,49 +196,52 @@
                   required
                 />
               </div>
+
               <div class="form-group">
                 <label for="venue">Venue</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="venue"
-                  v-model="currentEvent.venue"
+                <v-select
+                  :options="venues"
+                  v-model="currentEvent.venueId"
+                  :reduce="venue => venue.id"
+                  label="name"
+                  placeholder="Search Venue"
                   required
                 />
               </div>
+
               <div class="form-group">
                 <label for="category">Category</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="category"
-                  v-model="currentEvent.category"
+                <v-select
+                  :options="categories"
+                  v-model="currentEvent.categoryId"
+                  :reduce="category => category.id"
+                  label="name"
+                  placeholder="Search Category"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="organizer">Organizer</label>
+                <v-select
+                  :options="organizers"
+                  v-model="currentEvent.organizerId"
+                  :reduce="organizer => organizer.id"
+                  label="name"
+                  placeholder="Search Organizer"
                   required
                 />
               </div>
               <div class="form-group">
-                <label for="organizer">Organizer</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="organizer"
-                  v-model="currentEvent.organizer"
+                <label for="status">Status</label>
+                <v-select
+                  :options="eventStatuses"
+                  v-model="currentEvent.status"
+                  :reduce="status => status"
+                  label="status"
                   required
                 />
-              </div> 
-              <!--div class="form-group">
-                <label for="eventStatus">Status</label>
-                <select
-                  class="form-control"
-                  id="eventStatus"
-                  v-model="currentEvent.status"
-                  required
-                >
-                  <option value="upcoming">Upcoming</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div-->
+              </div>
               <div class="modal-footer  ">
                 <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">Cancel</button>
                 <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createEvent">Save</button> 
@@ -274,10 +259,47 @@
 
 <script>
 import { StatsCard } from "@/components/index";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
 export default {
   components: {
-    StatsCard,
+    StatsCard,vSelect
+  },
+  computed: {
+    formattedStartDate: {
+      get() {
+        if (this.currentEvent.startDate) {
+          return this.currentEvent.startDate.slice(0, 16);
+        }
+        return "";
+      },
+      set(value) {
+        this.currentEvent.startDate = value;
+      },
+    },
+    formattedEndDate: {
+      get() {
+        if (this.currentEvent.endDate) {
+          return this.currentEvent.endDate.slice(0, 16);
+        }
+        return "";
+      },
+      set(value) {
+        this.currentEvent.endDate = value;
+      },
+    },
+    formattedRegistrationDeadline: {
+      get() {
+        if (this.currentEvent.registrationDeadline) {
+          return this.currentEvent.registrationDeadline.slice(0, 16);
+        }
+        return "";
+      },
+      set(value) {
+        this.currentEvent.registrationDeadline = value;
+      },
+    },
   },
   data() {
     return {
@@ -293,6 +315,10 @@ export default {
         },
       ],
       events: [], // To store the fetched events
+      venues: [],
+      categories: [],
+      organizers: [],
+      eventStatuses: ["upcoming", "completed", "cancelled"],
       currentEvent: {
       }, // For storing the new event data from the form
       modalMode: 'create',
@@ -302,18 +328,20 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await this.$http.get("events");
-        this.events = response.data;
+        const eventsResponse = await this.$http.get("events");
+        this.events = eventsResponse.data;
+        const venuesResponse = await this.$http.get("venues");
+        this.venues = venuesResponse.data;
+        const categoriesResponse = await this.$http.get("categories");
+        this.categories = categoriesResponse.data;
+        const organizersResponse = await this.$http.get("organizations");
+        this.organizers = organizersResponse.data;
       } catch (error) {
         console.error("Error fetching events:", error);
       }
     },
     createEvent() {
-      // Send the new event to the server
-      this.currentEvent.organizer = 1;
-      this.currentEvent.category = 1;
-      this.currentEvent.venue = 1;
-      // this.currentEvent.location = null;
+      console.log(this.currentEvent);
       this.$http
         .post("events", this.currentEvent)
         .then((response) => {
@@ -328,11 +356,9 @@ export default {
     },
 
     updateEvent() {
-      this.currentEvent.organizer = 1;
-      this.currentEvent.category = 1;
-      this.currentEvent.venue = 1;
       // this.currentEvent.location = null;
       // Send the new event to the server
+      console.log(this.currentEvent); 
       this.$http
         .put(`events/${this.currentEvent.id}`, this.currentEvent)
         .then((response) => {
@@ -366,25 +392,6 @@ export default {
         startDate: "",
         status: "upcoming",
       };
-    },
-    formatDate(dateArray) {
-      // Destructure the array
-      const [year, month, day, hour, minute, second, nanoseconds] = dateArray;
-
-      // Convert the array into a Date object (JavaScript months are zero-based)
-      const date = new Date(year, month - 1, day, hour, minute, second, nanoseconds / 1000000);
-
-      // Format options for the output
-      const options = {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-
-      // Return the formatted date
-      return date.toLocaleDateString(undefined, options);
     },
     // Delete Data 
     async deleteEvent(eventId) {
@@ -424,12 +431,6 @@ export default {
   align-items: center;
 }
 
-.toggle-label {
-  margin-right: 10px;
-  font-weight: bold;
-  
-}
-
 .toggle-checkbox {
   position: absolute;
   opacity: 0;
@@ -437,17 +438,35 @@ export default {
   height: 0;
 }
 
-.slider {
+
+
+
+.switch {
   position: relative;
+  display: inline-block;
   width: 50px;
   height: 25px;
-  background-color: #ccc;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.slider::before {
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 25px;
+}
+
+.slider:before {
   position: absolute;
   content: "";
   height: 21px;
@@ -455,15 +474,15 @@ export default {
   left: 2px;
   bottom: 2px;
   background-color: white;
+  transition: 0.4s;
   border-radius: 50%;
-  transition: transform 0.2s;
 }
 
-.toggle-checkbox:checked + .slider {
-  background-color: #4CAF50;
+input:checked + .slider {
+  background-color: #4caf50;
 }
 
-.toggle-checkbox:checked + .slider::before {
+input:checked + .slider:before {
   transform: translateX(25px);
 }
 </style>

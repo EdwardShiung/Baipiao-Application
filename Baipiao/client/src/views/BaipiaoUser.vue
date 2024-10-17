@@ -7,22 +7,7 @@
           v-for="stats in statsCards"
           :key="stats.title"
         >
-          <stats-card>
-            <div
-              class="icon-big text-center"
-              :class="`icon-${stats.type}`"
-              slot="header"
-            >
-              <i :class="stats.icon"></i>
-            </div>
-            <div class="numbers" slot="content">
-              <p>{{ stats.title }}</p>
-              {{ users.length }}
-            </div>
-            <div class="stats" slot="footer">
-              <i :class="stats.footerIcon"></i> {{ stats.footerText }}
-            </div>
-          </stats-card>
+    
         </div>
       </div>
       <hr />
@@ -41,16 +26,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(event, index) in users" :key="event.id">
+              <tr v-for="(user, index) in users" :key="user.id">
                 <th scope="row">{{ index + 1 }}</th>
-                <td>{{ event.userName }}</td>
-                <td>{{ event.email }}</td>
-                <td>{{ event.phoneNumber }}</td>
-                <td>{{ event.userType }}</td>
+                <td>{{ user.userName }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phoneNumber }}</td>
+                <td>{{ user.userType }}</td>
                 <td>
-                  <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
+                  <button @click="deleteUser(user.id)" class="btn btn-danger btn-sm">
                     Delete
-                  </button>
+                  </button> &nbsp;
+                  <button  @click="editUser(user.id)" class="btn btn-primary btn-sm"> Edit </button>
               </td>
               </tr>
             </tbody>
@@ -62,79 +48,101 @@
           <button @click="openModal" class="btn btn-primary">Create</button>
         </div>
       </div>
-      <!-- Modal Dialog for Creating Events -->
+      <!-- Modal Dialog for Creating Users -->
       <div v-if="showModal" class="modal" tabindex="-1" role="dialog" style="display: block;">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Create New Event</h5>
-              <button
-                  type="button"
-                  class="close"
-                  @click="closeModal"
-                  aria-label="Close"
-                  style="margin-left: auto"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-              <!-- Form for creating event -->
-              <form @submit.prevent="createEvent">
-                <div class="form-group">
-                  <label for="eventName">Event Name</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="eventName"
-                    v-model="newUser.userName"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="eventLocation">Location</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="eventLocation"
-                    v-model="newUser.email"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="eventDate">Date</label>
-                  <input
-                    type="datetime-local"
-                    class="form-control"
-                    id="eventDate"
-                    v-model="newUser.phoneNumber"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="eventStatus">Status</label>
-                  <select
-                    class="form-control"
-                    id="eventStatus"
-                    v-model="newUser.userType"
-                    required
-                  >
-                    <option value="upcoming">Upcoming</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </div>
-                <div class="modal-footer  ">
-                  <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">Cancel</button>
-                <button type="submit" class="btn btn-primary" style="float: right">Save</button> 
-                
-                </div>
-                
-              </form>
-            </div>
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 v-if="modalMode=='create'" class="modal-title">Create New User</h5>
+            <h5 v-if="modalMode!=='create'" class="modal-title">Edit User: {{currentUser.name}}</h5>
+            <button
+                type="button"
+                class="close"
+                @click="closeModal"
+                aria-label="Close"
+                style="margin-left: auto"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+            <!-- Form for creating user -->
+            <form @submit.pruser="createUser">
+              <div class="form-group">
+                <label for="userName">User Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="userName"
+                  v-model="currentUser.userName"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="displayName">Display Name</label>
+                <textarea
+                  class="form-control"
+                  id="displayName"
+                  rows="3"
+                  required>{{currentUser.displayName}}</textarea>
+              </div>
+  
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  v-model="currentUser.password"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  v-model="currentUser.email"
+                  required
+                />
+              </div>
+              
+              <div class="form-group">
+                <label for="phoneNumber">Phone</label>
+                <input
+                  type="phone"
+                  class="form-control"
+                  id="phoneNumber"
+                  v-model="currentUser.phoneNumber"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="role">Role</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="role"
+                  v-model="currentUser.role"
+                  required
+                />
+              </div>
+              
+             
+              <div class="modal-footer  ">
+                <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">Cancel</button>
+                <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createUser">Save</button> 
+                <button v-if="modalMode!=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="updateUser">Update</button> 
+              
+              </div>
+              
+            </form>
           </div>
         </div>
       </div>
+    </div>
     </div>
   </template>
   
@@ -164,7 +172,7 @@
           email: "",
           phoneNumber: "",
           userType: "upcoming",
-        }, // For storing the new event data from the form
+        }, // For storing the new user data from the form
         showModal: false, // To control the visibility of the modal
       };
     },
@@ -177,17 +185,22 @@
           console.error("Error fetching users:", error);
         }
       },
-      createEvent() {
-        // Send the new event to the server
+      editUser(userId) {
+      this.currentUser = this.users.filter(user => user.id == userId)[0]; 
+      this.modalMode = 'edit';
+      this.showModal = true;
+    },
+      createUser() {
+        // Send the new user to the server
         this.$http
           .post("users", this.newUser)
           .then((response) => {
-            this.users.push(response.data); // Add the new event to the list
+            this.users.push(response.data); // Add the new user to the list
             this.closeModal(); // Close the modal after creation
-            this.resetNewEvent(); // Reset the form
+            this.resetNewUser(); // Reset the form
           })
           .catch((error) => {
-            console.error("Error creating event:", error);
+            console.error("Error creating user:", error);
           });
       },
       closeModal() {
@@ -196,7 +209,7 @@
       openModal() {
         this.showModal = true;
       },
-      resetNewEvent() {
+      resetNewUser() {
         // Reset the form fields
         this.newUser = {
           userName: "",
@@ -218,16 +231,16 @@
         return date.toLocaleDateString(undefined, options);
       },
       // Delete Data 
-      async deleteEvent(eventId) {
-        console.log(eventId)
-        const confirmDelete = confirm("Are you sure you want to delete this event?");
+      async deleteUser(userId) {
+        console.log(userId)
+        const confirmDelete = confirm("Are you sure you want to delete this user?");
         if (confirmDelete) {
           try {
-            await this.$http.delete(`users/${eventId}`);
-            // Update the Event Table
-            this.users = this.users.filter(event => event.id !== eventId); 
+            await this.$http.delete(`users/${userId}`);
+            // Update the User Table
+            this.users = this.users.filter(user => user.id !== userId); 
           } catch (error) {
-            console.error("Error deleting event:", error);
+            console.error("Error deleting user:", error);
             alert("Delete failed!"); 
           }
         }

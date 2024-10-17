@@ -59,13 +59,9 @@ public class EventController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @PostMapping("/events")
-    public ResponseEntity<EventDTO> newEvent(@Valid @RequestBody EventCreateDTO newEvent) {
-        EventDTO savedEvent = eventService.save(newEvent);
-        if (savedEvent==null) {
-            return ResponseEntity.notFound().build();
-        }else {
-            return ResponseEntity.status(201).body(savedEvent);    
-        }
+    public ResponseEntity<Void> newEvent(@Valid @RequestBody EventCreateDTO newEvent) {
+        eventService.save(newEvent);
+        return ResponseEntity.status(201).build(); // 201 Created
         
     }
 
@@ -101,13 +97,17 @@ public class EventController {
     @Operation(summary = "Update an existing event", description = "Update the details of an existing event or create a new one if it doesn't exist.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Event successfully updated"),
-            @ApiResponse(responseCode = "201", description = "Event created as it did not exist"),
-            @ApiResponse(responseCode = "400", description = "Invalid request")
+            @ApiResponse(responseCode = "404", description = "Event not found")
     })
     @PutMapping("/events/{id}")
-    public ResponseEntity<EventDTO> replaceEvent(@Valid @RequestBody EventCreateDTO newEvent, @PathVariable Long id) {
-
-        return ResponseEntity.status(201).body(eventService.save(newEvent));
+    public ResponseEntity<Void> replaceEvent(@Valid @RequestBody EventCreateDTO newEvent, @PathVariable Long id) {
+        try {
+            eventService.update(id, newEvent);
+            return ResponseEntity.status(200).build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+        
     }
 
     /**

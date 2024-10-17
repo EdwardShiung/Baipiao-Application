@@ -7,22 +7,6 @@
         v-for="stats in statsCards"
         :key="stats.title"
       >
-        <stats-card>
-          <div
-            class="icon-big text-center"
-            :class="`icon-${stats.type}`"
-            slot="header"
-          >
-            <i :class="stats.icon"></i>
-          </div>
-          <div class="numbers" slot="content">
-            <p>{{ stats.title }}</p>
-            {{ venues.length }}
-          </div>
-          <div class="stats" slot="footer">
-            <i :class="stats.footerIcon"></i> {{ stats.footerText }}
-          </div>
-        </stats-card>
       </div>
     </div>
     <hr />
@@ -33,10 +17,9 @@
           <thead>
             <tr>
               <th scope="col" width="10">#</th>
-              <th scope="col">Event</th>
+              <th scope="col">Venue</th>
               <th scope="col">Location</th>
-              <th scope="col">Date</th>
-              <th scope="col">Status</th>
+              <th scope="col">Description</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -45,12 +28,12 @@
               <th scope="row">{{ index + 1 }}</th>
               <td>{{ event.name }}</td>
               <td>{{ event.location }}</td>
-              <td>{{ formatDate(event.startDate) }}</td>
               <td>{{ event.description }}</td>
               <td>
-                <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
+                <button @click="deleteVenue(event.id)" class="btn btn-danger btn-sm">
                   Delete
-                </button>
+                </button>&nbsp;
+                <button  class="btn btn-primary btn-sm"> Edit </button>
             </td>
             </tr>
           </tbody>
@@ -67,7 +50,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Create New Event</h5>
+            <h5 v-if="modalMode=='create'" class="modal-title">Edit New Venue</h5>
+            <h5 v-if="modalMode!=='create'" class="modal-title">Edit Venue: Lane Stadium</h5>
             <button
                 type="button"
                 class="close"
@@ -102,31 +86,19 @@
                 />
               </div>
               <div class="form-group">
-                <label for="eventDate">Date</label>
+                <label for="eventDate">Description</label>
                 <input
-                  type="datetime-local"
+                  type="text"
                   class="form-control"
                   id="eventDate"
-                  v-model="newVenue.startDate"
+                  v-model="newVenue.description"
                   required
                 />
               </div>
-              <div class="form-group">
-                <label for="eventStatus">Status</label>
-                <select
-                  class="form-control"
-                  id="eventStatus"
-                  v-model="newVenue.description"
-                  required
-                >
-                  <option value="upcoming">Upcoming</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
+              
               <div class="modal-footer  ">
                 <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">Cancel</button>
-              <button type="submit" class="btn btn-primary" style="float: right">Save</button> 
+              <button type="submit" class="btn btn-primary" style="float: right">Update</button> 
               
               </div>
               
@@ -158,6 +130,7 @@ export default {
           footerIcon: "ti-reload",
         },
       ],
+      currentVenue: {},
       venues: [], // To store the fetched venues
       newVenue: {
         name: "",
@@ -218,14 +191,14 @@ export default {
       return date.toLocaleDateString(undefined, options);
     },
     // Delete Data 
-    async deleteEvent(eventId) {
-      console.log(eventId)
-      const confirmDelete = confirm("Are you sure you want to delete this event?");
+    async deleteVenue(eventId) {
+      const confirmDelete = confirm("Are you sure you want to delete this venue?");
       if (confirmDelete) {
         try {
           await this.$http.delete(`venues/${eventId}`);
           // Update the Event Table
           this.venues = this.venues.filter(event => event.id !== eventId); 
+          this.currentVenue = this.venues[0]; 
         } catch (error) {
           console.error("Error deleting event:", error);
           alert("Delete failed!"); 

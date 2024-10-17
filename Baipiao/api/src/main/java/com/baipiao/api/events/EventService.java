@@ -1,4 +1,6 @@
 package com.baipiao.api.events;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.baipiao.api.categories.CategoryRepository;
 import com.baipiao.api.organizations.OrganizationRepository;
+import com.baipiao.api.venues.PointDeserializer;
+import com.baipiao.api.venues.PointSerializer;
 import com.baipiao.api.venues.VenueRepository;
 
 import jakarta.transaction.Transactional;
@@ -31,49 +35,70 @@ public class EventService {
         }).collect(Collectors.toList());
     }
 
-    @Transactional
     public Event getEventWithTickets(Long eventId) {
         // Fetch the event with tickets
         return eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found"));
     }
-    public EventDTO save(EventCreateDTO newEvent) {
-        Event event = new Event();
-        if (newEvent.getId() != null) {
-            event = eventRepository.findById(newEvent.getId()).orElseThrow(() -> new RuntimeException("Event not found"));
-        }
-        event.setId(newEvent.getId());
-        event.setName(newEvent.getName());
-        event.setDetails(newEvent.getDetails());
-        event.setRegistrationRequired(newEvent.isRegistrationRequired());
-        event.setRegistrationLink(newEvent.getRegistrationLink());
-        event.setContactEmail(newEvent.getContactEmail());
-        event.setContactPhoneNumber(newEvent.getContactPhoneNumber());
-        event.setStatus(newEvent.getStatus());
-        event.setCapacity(newEvent.getCapacity());
-        event.setImage(newEvent.getImage());
-        event.setVenue(venueRepository.findById(newEvent.getVenue()).orElse(null)); 
-        event.setCategory(categoryRepository.findById(newEvent.getCategory()).orElse(null));
-        event.setOrganizer(organizationRepository.findById(newEvent.getOrganizer()).orElse(null));
-        event.setRegistrationDeadline(newEvent.getRegistrationDeadline());
-        event.setStartDate(newEvent.getStartDate());
-        event.setEndDate(newEvent.getEndDate());
-        event = eventRepository.save(event);
-        return new EventDTO(event);
-
+    public void save(EventCreateDTO newEvent) {
+        eventRepository.insertEvent(
+                newEvent.getName(), // String
+                newEvent.getDetails(), // String
+                newEvent.isRegistrationRequired(), // Boolean
+                newEvent.getRegistrationLink(), // String
+                newEvent.getContactEmail(), // String
+                newEvent.getContactPhoneNumber(), // String
+                newEvent.getStatus(), // String
+                newEvent.getCapacity(), // Integer
+                newEvent.getImage(), // String
+                newEvent.getRegistrationDeadline(), // LocalDateTime
+                newEvent.getStartDate(), // LocalDateTime
+                newEvent.getEndDate(), // LocalDateTime
+                LocalDateTime.now(), // createDate (current timestamp)
+                newEvent.getVenueId(), // Long
+                newEvent.getCategoryId(), // Long
+                newEvent.getOrganizerId() // Long
+        );
     }
+
+    public void update(Long id, EventCreateDTO newEvent) {
+        if (!eventRepository.existsById(id)) {
+            throw new EventNotFoundException(id);
+        } else {
+            eventRepository.updateEvent(
+                    id,
+                    newEvent.getName(),
+                    newEvent.getDetails(),
+                    newEvent.isRegistrationRequired(),
+                    newEvent.getRegistrationLink(),
+                    newEvent.getContactEmail(),
+                    newEvent.getContactPhoneNumber(),
+                    newEvent.getStatus(),
+                    newEvent.getCapacity(),
+                    newEvent.getImage(),
+                    newEvent.getRegistrationDeadline(),
+                    newEvent.getStartDate(),
+                    newEvent.getEndDate(),
+                    newEvent.getVenueId(),
+                    newEvent.getCategoryId(),
+                    newEvent.getOrganizerId());
+        }
+    }
+
     public EventDTO find(Long id) {
         return eventRepository.findById(id).map(event -> {
             return new EventDTO(event);
         }).orElse(null);
     }
+
     public EventDTO deleteById(Long id) {
-        eventRepository.findById(id).map(event->{
+        eventRepository.findById(id).map(event -> {
             eventRepository.delete(event);
             return new EventDTO(event);
         }).orElseThrow(() -> new EventNotFoundException(id));
         return null;
     }
-    public boolean  existsById(Long id) {    
+
+    public boolean existsById(Long id) {
         return eventRepository.existsById(id);
     }
 }
