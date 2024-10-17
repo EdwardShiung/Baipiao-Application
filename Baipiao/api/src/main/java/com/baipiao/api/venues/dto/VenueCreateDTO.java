@@ -11,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class VenueCreateDTO implements Serializable {
 
@@ -25,16 +27,6 @@ public class VenueCreateDTO implements Serializable {
     @JsonSerialize(using = PointSerializer.class)
     private Point location;
 
-    private Long createdBy;
-
-    private Long updatedBy;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
-
     public VenueCreateDTO() {
     }
 
@@ -43,9 +35,5 @@ public class VenueCreateDTO implements Serializable {
         this.name = venue.getName();
         this.description = venue.getDescription();
         this.location = venue.getLocation();
-        this.createdAt = venue.getCreatedAt();
-        this.updatedAt = venue.getUpdatedAt();
-        this.createdBy = venue.getCreatedBy() != null ? venue.getCreatedBy().getId() : null;
-        this.updatedBy = venue.getUpdatedBy() != null ? venue.getUpdatedBy().getId() : null;
     }
 }

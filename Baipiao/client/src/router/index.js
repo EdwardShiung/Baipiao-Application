@@ -7,6 +7,8 @@ import LoginAndRegister from '../views/LoginAndRegister.vue'
 import BaipiaoUser from '../views/BaipiaoUser.vue'
 // import BaipiaoList from '../views/BaipiaoList.vue'
 import BaipiaoVenue from '@/views/BaipiaoVenue.vue'
+import BaipiaoCategory from '@/views/BaipiaoCategory.vue'
+import BaipiaoOrganization from '@/views/BaipiaoOrganization.vue'
 
 
 Vue.use(VueRouter)
@@ -43,6 +45,17 @@ const routes = [
         path: "baipiaoVenue",
         name: "baipiaoVenue",
         component: BaipiaoVenue,
+      },
+      {
+        path: "baipiaoCategory",
+        name: "baipiaoCategory",
+        component: BaipiaoCategory,
+      },
+
+      {
+        path: "baipiaoOrganization",
+        name: "baipiaoOrganization",
+        component: BaipiaoOrganization,
       },
     ],
   },

@@ -18,25 +18,23 @@
             <tr>
               <th scope="col" width="10">#</th>
               <th scope="col">Name</th>
-              <th scope="col">Location</th>
               <th scope="col">Description</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(venue, index) in venues" :key="venue.id">
+            <tr v-for="(category, index) in categories" :key="category.id">
               <th scope="row">{{ index + 1 }}</th>
-              <td>{{ venue.name }}</td>
-              <td>{{ venue.location }}</td>
-              <td>{{ venue.description }}</td>
+              <td>{{ category.name }}</td>
+              <td>{{ category.description }}</td>
               <td>
-                <button @click="viewVenue(venue.id)" class="btn btn-primary btn-sm">
+                <button @click="viewCategory(category.id)" class="btn btn-primary btn-sm">
                   View
                 </button> &nbsp;
-                <button @click="editVenue(venue.id)" class="btn btn-secondary btn-sm">
+                <button @click="editCategory(category.id)" class="btn btn-secondary btn-sm">
                   Edit
                 </button>&nbsp;
-                <button @click="deleteVenue(venue.id)" class="btn btn-danger btn-sm">
+                <button @click="deleteCategory(category.id)" class="btn btn-danger btn-sm">
                   Delete
                 </button> 
                 
@@ -57,9 +55,9 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="modalMode=='create'" class="modal-title">Edit New Venue</h5>
-            <h5 v-if="modalMode=='edit'" class="modal-title">Edit Venue: {{ currentVenue.name }}</h5>
-            <h5 v-if="modalMode=='view'" class="modal-title">Venue: {{ currentVenue.name }}</h5>
+            <h5 v-if="modalMode=='create'" class="modal-title">Edit New Category</h5>
+            <h5 v-if="modalMode=='edit'" class="modal-title">Edit Category: {{ currentCategory.name }}</h5>
+            <h5 v-if="modalMode=='view'" class="modal-title">Category: {{ currentCategory.name }}</h5>
             <button
                 type="button"
                 class="close"
@@ -71,57 +69,27 @@
               </button>
           </div>
           <div class="modal-body">
-            <!-- Form for creating venue -->
+            <!-- Form for creating category -->
             <form >
               <div class="form-group">
-                <label for="venueName">Venue Name</label>
+                <label for="categoryName">Category Name</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="venueName"
-                  v-model="currentVenue.name"
+                  id="categoryName"
+                  v-model="currentCategory.name"
                   :disabled="modalMode === 'view'"
                   required
                 />
               </div>
-              <div class="form-group">
-                <label>Location</label>
-                <div style="display: flex; gap: 15px;">
-                  <div>
-                    <label for="venueLocationX">X: </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="venueLocationX"
-                      v-model="currentVenue.location.x"
-                      :disabled="modalMode === 'view'"
-                      required
-                      style="width: 225px;"
-                    />
-                  </div>
-
-                  <div>
-                    <label for="venueLocationY">Y: </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="venueLocationY"
-                      v-model="currentVenue.location.y"
-                      :disabled="modalMode === 'view'"
-                      required
-                      style="width: 225px;"
-                    />
-                  </div>
-                </div>
-              </div>
-
+              
               <div class="form-group">
                 <label for="description">Description</label>
                 <input
                   type="text"
                   class="form-control"
                   id="description"
-                  v-model="currentVenue.description"
+                  v-model="currentCategory.description"
                   :disabled="modalMode === 'view'"
                   required
                 />
@@ -129,8 +97,8 @@
               
               <div class="modal-footer  ">
                 <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">{{ (modalMode==='view') ? "Close" :  "Cancel" }}</button>
-                <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createVenue">Save</button> 
-                <button v-if="modalMode=='edit'" type="submit" class="btn btn-primary" style="float: right"  @click="updateVenue">Update</button> 
+                <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createCategory">Save</button> 
+                <button v-if="modalMode=='edit'" type="submit" class="btn btn-primary" style="float: right"  @click="updateCategory">Update</button> 
               </div>
               
             </form>
@@ -161,14 +129,10 @@ export default {
           footerIcon: "ti-reload",
         },
       ],
-      currentVenue: {},
-      venues: [], // To store the fetched venues
-      currentVenue: {
+      currentCategory: {},
+      categories: [], // To store the fetched categories
+      currentCategory: {
         name: "",
-        location: {
-          x: "",
-          y: ""
-        },
         description: "",
       },
       modalMode: 'create',
@@ -178,35 +142,36 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await this.$http.get("venues");
-        this.venues = response.data;
+        const response = await this.$http.get("categories");
+        this.categories = response.data;
       } catch (error) {
-        console.error("Error fetching venues:", error);
+        console.error("Error fetching categories:", error);
       }
     },
-    createVenue() {
+    createCategory() {
+      console.log(this.currentCategory);
+
       this.$http
-        .post("venues", this.currentVenue)
+        .post("categories", this.currentCategory)
         .then((response) => {
           this.closeModal(); // Close the modal after creation
-          this.resetNewVenue(); // Reset the form
+          this.resetNewCategory(); // Reset the form
           this.fetchData();
         })
         .catch((error) => {
-          console.error("Error creating venue:", error);
+          console.error("Error creating category:", error);
         });
     },
-    updateVenue() {
-      console.log(this.currentVenue);
+    updateCategory() {
       this.$http
-        .put(`venues/${this.currentVenue.id}`, this.currentVenue)
+        .put(`categories/${this.currentCategory.id}`, this.currentCategory)
         .then((response) => {
           this.closeModal(); // Close the modal after creation
-          this.resetNewVenue(); // Reset the form
+          this.resetNewCategory(); // Reset the form
           this.fetchData();
         })
         .catch((error) => {
-          console.error("Error updating venue:", error);
+          console.error("Error updating category:", error);
         });
     },
     closeModal() {
@@ -214,50 +179,46 @@ export default {
     },
     openModal() {
       if(this.modalMode=='create'){
-        this.resetNewVenue();
+        this.resetNewCategory();
       }
       this.showModal = true;
     },
-    viewVenue(venueId) {
-      this.currentVenue = this.venues.filter(venue => venue.id == venueId)[0]; 
+    viewCategory(categoryId) {
+      this.currentCategory = this.categories.filter(category => category.id == categoryId)[0]; 
       this.modalMode = 'view';
       this.showModal = true;
     },
-    editVenue(venueId) {
-      this.currentVenue = this.venues.filter(venue => venue.id == venueId)[0]; 
+    editCategory(categoryId) {
+      this.currentCategory = this.categories.filter(category => category.id == categoryId)[0]; 
       this.modalMode = 'edit';
       this.showModal = true;
     },
-    resetNewVenue() {
+    resetNewCategory() {
       // Reset the form fields
-      this.currentVenue = {
+      this.currentCategory = {
           name: "",
-          location: {
-            x: "",
-            y: ""
-          },
           description: "",
         }
     },
     // Delete Data 
-    async deleteVenue(venueId) {
-      const confirmDelete = confirm("Are you sure you want to delete this venue?");
+    async deleteCategory(categoryId) {
+      const confirmDelete = confirm("Are you sure you want to delete this category?");
       if (confirmDelete) {
         try {
-          await this.$http.delete(`venues/${venueId}`);
+          await this.$http.delete(`categories/${categoryId}`);
           // Update the Event Table
-          this.venues = this.venues.filter(venue => venue.id !== venueId); 
+          this.categories = this.categories.filter(category => category.id !== categoryId); 
           this.fetchData();
-          this.resetNewVenue()
+          this.resetNewCategory()
         } catch (error) {
-          console.error("Error deleting venue:", error);
+          console.error("Error deleting category:", error);
           alert("Delete failed!"); 
         }
       }
     },
   },
   created() {
-    this.fetchData(); // Fetch venues when the component is created
+    this.fetchData(); // Fetch categories when the component is created
   },
 };
 </script>

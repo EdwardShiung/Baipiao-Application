@@ -37,10 +37,9 @@ public interface VenueRepository extends JpaRepository<Venue, Long> {
     // Update: Update a venue by its ID
     @Modifying
     @Transactional
-    @Query(value = "UPDATE venues SET name = :name, description = :description , location = :location, created_by_id = :createdBy, created_at = :createdAt, updated_by_id = :updatedBy, updated_at = :updatedAt WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE venues SET name = :name, description = :description , location = :location, updated_by_id = :updatedBy, updated_at = :updatedAt WHERE id = :id", nativeQuery = true)
     void updateVenue(@Param("id") Long id, @Param("name") String name, @Param("description") String description,
-            @Param("location") Point location, @Param("createdBy") Long createdBy,
-            @Param("createdAt") LocalDateTime createdAt, @Param("updatedBy") Long updatedBy,
+            @Param("location") Point location, @Param("updatedBy") Long updatedBy,
             @Param("updatedAt") LocalDateTime updatedAt);
 
     // Delete: Delete a venue by its ID

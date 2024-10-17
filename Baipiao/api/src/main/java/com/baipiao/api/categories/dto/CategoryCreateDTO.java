@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import com.baipiao.api.categories.Category;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class CategoryCreateDTO  implements Serializable {
     private Long id;

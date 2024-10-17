@@ -2,17 +2,11 @@
     <div class="wrapper">
       <side-bar>
         <template slot="links">
-          <sidebar-link to="/" name="Baipiao Events" icon="ti-panel" />
-          <sidebar-link
-            to="/baipiaouser"
-            name="Baipiao User"
-            icon="ti-map-alt"
-          />
-          <sidebar-link
-            to="/baipiaoVenue"
-            name="Baipiao Venue "
-            icon="ti-map-alt"
-          />
+          <sidebar-link to="/" name="Baipiao Events" icon="ti-calendar" />
+          <sidebar-link to="/baipiaouser" name="Users" icon="ti-user" />
+          <sidebar-link to="/baipiaoOrganization" name="Organizations" icon="ti-briefcase" />
+          <sidebar-link to="/baipiaoVenue" name="Venues" icon="ti-location-pin" />
+          <sidebar-link to="/baipiaoCategory" name="Event Categories" icon="ti-tag" />
         </template>
 <!-- Mobile Side Bar -->
 <mobile-menu>

@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 
 import com.baipiao.api.organizations.Organization;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class OrganizationCreateDTO implements Serializable {
     private Long id;

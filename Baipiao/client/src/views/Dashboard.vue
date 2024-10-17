@@ -48,12 +48,15 @@
               <td>{{ event.startDate }}</td>
               <td>{{ event.status }}</td>
               <td>
+                <button @click="viewEvent(event.id)" class="btn btn-primary btn-sm">
+                  View
+                </button> &nbsp;
+                <button @click="editEvent(event.id)" class="btn btn-secondary btn-sm">
+                  Edit
+                </button>&nbsp;
                 <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
                   Delete
-                </button> &nbsp;
-                <button @click="editEvent(event.id)" class="btn btn-primary btn-sm">
-                  Edit
-                </button>
+                </button> 
             </td>
             </tr>
           </tbody>
@@ -71,7 +74,8 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 v-if="modalMode=='create'" class="modal-title">Create New Event</h5>
-            <h5 v-if="modalMode!=='create'" class="modal-title">Edit Event: {{currentEvent.name}}</h5>
+            <h5 v-if="modalMode=='edit'" class="modal-title">Edit Event: {{currentEvent.name}}</h5>
+            <h5 v-if="modalMode=='view'" class="modal-title">Event: {{currentEvent.name}}</h5>
             <button
                 type="button"
                 class="close"
@@ -92,6 +96,7 @@
                   class="form-control"
                   id="eventName"
                   v-model="currentEvent.name"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -101,6 +106,7 @@
                 <textarea
                   class="form-control"
                   id="eventDetails"
+                  :disabled="modalMode === 'view'"
                   rows="3"
                   required>{{currentEvent.details}}</textarea>
               </div>
@@ -111,6 +117,7 @@
                   class="form-control"
                   id="startDate"
                   v-model="formattedStartDate"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -121,6 +128,7 @@
                   class="form-control"
                   id="endDate"
                   v-model="formattedEndDate"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -131,6 +139,7 @@
                   type="checkbox"
                   id="registrationRequired"
                   v-model="currentEvent.registrationRequired"
+                  :disabled="modalMode === 'view'"
                   class="toggle-checkbox"
                 />
                 <span class="slider"></span>
@@ -143,6 +152,7 @@
                   class="form-control"
                   id="registrationLink"
                   v-model="currentEvent.registrationLink"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -153,6 +163,7 @@
                   class="form-control"
                   id="registrationDeadline"
                   v-model="formattedRegistrationDeadline"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -163,6 +174,7 @@
                   class="form-control"
                   id="contactEmail"
                   v-model="currentEvent.contactEmail"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -173,6 +185,7 @@
                   class="form-control"
                   id="contactPhoneNumber"
                   v-model="currentEvent.contactPhoneNumber"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -183,6 +196,7 @@
                   class="form-control"
                   id="capacity"
                   v-model="currentEvent.capacity"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -193,6 +207,7 @@
                   class="form-control"
                   id="image"
                   v-model="currentEvent.image"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -205,6 +220,7 @@
                   :reduce="venue => venue.id"
                   label="name"
                   placeholder="Search Venue"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -217,6 +233,7 @@
                   :reduce="category => category.id"
                   label="name"
                   placeholder="Search Category"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -229,6 +246,7 @@
                   :reduce="organizer => organizer.id"
                   label="name"
                   placeholder="Search Organizer"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
@@ -239,13 +257,14 @@
                   v-model="currentEvent.status"
                   :reduce="status => status"
                   label="status"
+                  :disabled="modalMode === 'view'"
                   required
                 />
               </div>
               <div class="modal-footer  ">
-                <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">Cancel</button>
+                <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">{{ (modalMode==='view') ? "Close" :  "Cancel" }}</button>
                 <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createEvent">Save</button> 
-                <button v-if="modalMode!=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="updateEvent">Update</button> 
+                <button v-if="modalMode=='edit'" type="submit" class="btn btn-primary" style="float: right"  @click="updateEvent">Update</button> 
               
               </div>
               
@@ -345,7 +364,6 @@ export default {
       this.$http
         .post("events", this.currentEvent)
         .then((response) => {
-          this.events.push(response.data); // Add the new event to the list
           this.closeModal(); // Close the modal after creation
           this.resetNewEvent(); // Reset the form
           this.fetchData();
@@ -378,6 +396,11 @@ export default {
       this.modalMode = 'create';
     },
 
+    viewEvent(eventId) {
+      this.currentEvent = this.events.filter(event => event.id == eventId)[0]; 
+      this.modalMode = 'view';
+      this.showModal = true;
+    },
     editEvent(eventId) {
       this.currentEvent = this.events.filter(event => event.id == eventId)[0]; 
       this.modalMode = 'edit';

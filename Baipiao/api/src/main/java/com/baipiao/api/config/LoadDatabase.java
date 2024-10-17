@@ -49,7 +49,7 @@ public class LoadDatabase {
             // Random venue data
             List<String> venueNames = Arrays.asList("Lane Stadium", "Squires Student Center", "Downtown Blacksburg", "Blacksburg Park", "Tech Hall", "VT Sports Arena", "Blacksburg Mall", "Heritage Museum", "The Lyric Theater", "Blacksburg Library", "Cassell Coliseum", "VT Quad", "Main Street Plaza", "University Plaza", "Research Park");
 
-            List<String> categoryNames = Arrays.asList("Sports", "Music", "Entertainment", "Food", "Community", "Community", "Community", "Community", "Community", "Community", "Community", "Community", "Community", "Community", "Community");
+            List<String> categoryNames = Arrays.asList("Sports", "Music", "Entertainment", "Food", "Community");
             
             List<String> eventStatusList = Arrays.asList("active", "upcoming", "past");
 
@@ -107,7 +107,7 @@ public class LoadDatabase {
                 Organization organizer = organizations.get(random.nextInt(organizations.size())); // Random organizer
                 Venue venue = venues.get(random.nextInt(venues.size())); // Random venue
 
-                Category category = categories.get(random.nextInt(venues.size())); // Random venue
+                Category category = categories.get(random.nextInt(categories.size())); // Random venue
                 
                 LocalDateTime registrationDeadline = LocalDateTime.now().plusDays(random.nextInt(30));  // Random registration deadline
                 Event event = new Event(

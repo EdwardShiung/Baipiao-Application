@@ -18,25 +18,25 @@
             <tr>
               <th scope="col" width="10">#</th>
               <th scope="col">Name</th>
-              <th scope="col">Location</th>
+              <th scope="col">Phone No.</th>
               <th scope="col">Description</th>
               <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(venue, index) in venues" :key="venue.id">
+            <tr v-for="(organization, index) in organizations" :key="organization.id">
               <th scope="row">{{ index + 1 }}</th>
-              <td>{{ venue.name }}</td>
-              <td>{{ venue.location }}</td>
-              <td>{{ venue.description }}</td>
+              <td>{{ organization.name }}</td>
+              <td>{{ organization.phoneno}}</td>
+              <td>{{ organization.description }}</td>
               <td>
-                <button @click="viewVenue(venue.id)" class="btn btn-primary btn-sm">
+                <button @click="viewOrganization(organization.id)" class="btn btn-primary btn-sm">
                   View
                 </button> &nbsp;
-                <button @click="editVenue(venue.id)" class="btn btn-secondary btn-sm">
+                <button @click="editOrganization(organization.id)" class="btn btn-secondary btn-sm">
                   Edit
                 </button>&nbsp;
-                <button @click="deleteVenue(venue.id)" class="btn btn-danger btn-sm">
+                <button @click="deleteOrganization(organization.id)" class="btn btn-danger btn-sm">
                   Delete
                 </button> 
                 
@@ -57,9 +57,9 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="modalMode=='create'" class="modal-title">Edit New Venue</h5>
-            <h5 v-if="modalMode=='edit'" class="modal-title">Edit Venue: {{ currentVenue.name }}</h5>
-            <h5 v-if="modalMode=='view'" class="modal-title">Venue: {{ currentVenue.name }}</h5>
+            <h5 v-if="modalMode=='create'" class="modal-title">Edit New Organization</h5>
+            <h5 v-if="modalMode=='edit'" class="modal-title">Edit Organization: {{ currentOrganization.name }}</h5>
+            <h5 v-if="modalMode=='view'" class="modal-title">Organization: {{ currentOrganization.name }}</h5>
             <button
                 type="button"
                 class="close"
@@ -71,57 +71,51 @@
               </button>
           </div>
           <div class="modal-body">
-            <!-- Form for creating venue -->
+            <!-- Form for creating organization -->
             <form >
               <div class="form-group">
-                <label for="venueName">Venue Name</label>
+                <label for="organizationName">Organization Name</label>
                 <input
                   type="text"
                   class="form-control"
-                  id="venueName"
-                  v-model="currentVenue.name"
+                  id="organizationName"
+                  v-model="currentOrganization.name"
                   :disabled="modalMode === 'view'"
                   required
                 />
               </div>
-              <div class="form-group">
-                <label>Location</label>
-                <div style="display: flex; gap: 15px;">
-                  <div>
-                    <label for="venueLocationX">X: </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="venueLocationX"
-                      v-model="currentVenue.location.x"
-                      :disabled="modalMode === 'view'"
-                      required
-                      style="width: 225px;"
-                    />
-                  </div>
-
-                  <div>
-                    <label for="venueLocationY">Y: </label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="venueLocationY"
-                      v-model="currentVenue.location.y"
-                      :disabled="modalMode === 'view'"
-                      required
-                      style="width: 225px;"
-                    />
-                  </div>
-                </div>
-              </div>
-
+              
               <div class="form-group">
                 <label for="description">Description</label>
                 <input
                   type="text"
                   class="form-control"
                   id="description"
-                  v-model="currentVenue.description"
+                  v-model="currentOrganization.description"
+                  :disabled="modalMode === 'view'"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="organizationEmail">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="organizationEmail"
+                  v-model="currentOrganization.email"
+                  :disabled="modalMode === 'view'"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="organizationPhone">Phone #</label>
+                <input
+                  type="phonenumber"
+                  class="form-control"
+                  id="organizationPhone"
+                  v-model="currentOrganization.phoneno"
                   :disabled="modalMode === 'view'"
                   required
                 />
@@ -129,8 +123,8 @@
               
               <div class="modal-footer  ">
                 <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">{{ (modalMode==='view') ? "Close" :  "Cancel" }}</button>
-                <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createVenue">Save</button> 
-                <button v-if="modalMode=='edit'" type="submit" class="btn btn-primary" style="float: right"  @click="updateVenue">Update</button> 
+                <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createOrganization">Save</button> 
+                <button v-if="modalMode=='edit'" type="submit" class="btn btn-primary" style="float: right"  @click="updateOrganization">Update</button> 
               </div>
               
             </form>
@@ -161,15 +155,13 @@ export default {
           footerIcon: "ti-reload",
         },
       ],
-      currentVenue: {},
-      venues: [], // To store the fetched venues
-      currentVenue: {
+      currentOrganization: {},
+      organizations: [], // To store the fetched organizations
+      currentOrganization: {
         name: "",
-        location: {
-          x: "",
-          y: ""
-        },
         description: "",
+        email: "",
+        phoneno: "",
       },
       modalMode: 'create',
       showModal: false, // To control the visibility of the modal
@@ -178,35 +170,36 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await this.$http.get("venues");
-        this.venues = response.data;
+        const response = await this.$http.get("organizations");
+        this.organizations = response.data;
       } catch (error) {
-        console.error("Error fetching venues:", error);
+        console.error("Error fetching organizations:", error);
       }
     },
-    createVenue() {
+    createOrganization() {
+      console.log(this.currentOrganization);
+
       this.$http
-        .post("venues", this.currentVenue)
+        .post("organizations", this.currentOrganization)
         .then((response) => {
           this.closeModal(); // Close the modal after creation
-          this.resetNewVenue(); // Reset the form
+          this.resetNewOrganization(); // Reset the form
           this.fetchData();
         })
         .catch((error) => {
-          console.error("Error creating venue:", error);
+          console.error("Error creating organization:", error);
         });
     },
-    updateVenue() {
-      console.log(this.currentVenue);
+    updateOrganization() {
       this.$http
-        .put(`venues/${this.currentVenue.id}`, this.currentVenue)
+        .put(`organizations/${this.currentOrganization.id}`, this.currentOrganization)
         .then((response) => {
           this.closeModal(); // Close the modal after creation
-          this.resetNewVenue(); // Reset the form
+          this.resetNewOrganization(); // Reset the form
           this.fetchData();
         })
         .catch((error) => {
-          console.error("Error updating venue:", error);
+          console.error("Error updating organization:", error);
         });
     },
     closeModal() {
@@ -214,50 +207,46 @@ export default {
     },
     openModal() {
       if(this.modalMode=='create'){
-        this.resetNewVenue();
+        this.resetNewOrganization();
       }
       this.showModal = true;
     },
-    viewVenue(venueId) {
-      this.currentVenue = this.venues.filter(venue => venue.id == venueId)[0]; 
+    viewOrganization(organizationId) {
+      this.currentOrganization = this.organizations.filter(organization => organization.id == organizationId)[0]; 
       this.modalMode = 'view';
       this.showModal = true;
     },
-    editVenue(venueId) {
-      this.currentVenue = this.venues.filter(venue => venue.id == venueId)[0]; 
+    editOrganization(organizationId) {
+      this.currentOrganization = this.organizations.filter(organization => organization.id == organizationId)[0]; 
       this.modalMode = 'edit';
       this.showModal = true;
     },
-    resetNewVenue() {
+    resetNewOrganization() {
       // Reset the form fields
-      this.currentVenue = {
+      this.currentOrganization = {
           name: "",
-          location: {
-            x: "",
-            y: ""
-          },
           description: "",
         }
     },
     // Delete Data 
-    async deleteVenue(venueId) {
-      const confirmDelete = confirm("Are you sure you want to delete this venue?");
+    async deleteOrganization(organizationId) {
+      const confirmDelete = confirm("Are you sure you want to delete this organization?");
       if (confirmDelete) {
         try {
-          await this.$http.delete(`venues/${venueId}`);
+          await this.$http.delete(`organizations/${organizationId}`);
           // Update the Event Table
-          this.venues = this.venues.filter(venue => venue.id !== venueId); 
+          this.organizations = this.organizations.filter(organization => organization.id !== organizationId); 
           this.fetchData();
-          this.resetNewVenue()
+          this.resetNewOrganization()
         } catch (error) {
-          console.error("Error deleting venue:", error);
+          console.error("Error deleting organization:", error);
           alert("Delete failed!"); 
         }
       }
     },
   },
   created() {
-    this.fetchData(); // Fetch venues when the component is created
+    this.fetchData(); // Fetch organizations when the component is created
   },
 };
 </script>

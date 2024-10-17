@@ -25,16 +25,6 @@ public class VenueDTO implements Serializable {
     @JsonSerialize(using = PointSerializer.class)
     private Point location;
 
-    private String createdBy;
-
-    private String updatedBy;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
-
     public VenueDTO() {
     }
 
@@ -43,9 +33,5 @@ public class VenueDTO implements Serializable {
         this.name = venue.getName();
         this.description = venue.getDescription();
         this.location = venue.getLocation();
-        this.createdBy = venue.getCreatedBy() != null ? venue.getCreatedBy().getDisplayName() : "";
-        this.updatedBy = venue.getUpdatedBy() != null ? venue.getUpdatedBy().getDisplayName() : "";
-        this.createdAt = venue.getCreatedAt();
-        this.updatedAt = venue.getUpdatedAt();
     }
 }
