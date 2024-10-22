@@ -9,7 +9,7 @@ import BaipiaoUser from '../views/BaipiaoUser.vue'
 import BaipiaoVenue from '@/views/BaipiaoVenue.vue'
 import BaipiaoCategory from '@/views/BaipiaoCategory.vue'
 import BaipiaoOrganization from '@/views/BaipiaoOrganization.vue'
-
+import BaipiaoEvent from '@/views/BaipiaoEvent.vue'
 
 Vue.use(VueRouter)
 
@@ -29,6 +29,11 @@ const routes = [
         path: "dashboard",
         name: "dashboard",
         component: Dashboard,
+      },
+      {
+        path: "baipiaoEvents",
+        name: "baipiaoEvents",
+        component: BaipiaoEvent,
       },
       // Don't Delete!!!!
       // {

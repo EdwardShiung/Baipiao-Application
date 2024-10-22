@@ -3,6 +3,7 @@
       <side-bar>
         <template slot="links">
           <sidebar-link to="/" name="Baipiao Events" icon="ti-calendar" />
+          <sidebar-link to="/baipiaoEvents" name="Events" icon="ti-map" />
           <sidebar-link to="/baipiaouser" name="Users" icon="ti-user" />
           <sidebar-link to="/baipiaoOrganization" name="Organizations" icon="ti-briefcase" />
           <sidebar-link to="/baipiaoVenue" name="Venues" icon="ti-location-pin" />
