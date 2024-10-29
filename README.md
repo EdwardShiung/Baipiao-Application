@@ -1,5 +1,3 @@
-# Baipiao-Application
-
 # Baipiao Management System
 
 ## Project Description
@@ -30,12 +28,10 @@ npm run serve
 ### 2. Backend: Spring Boot
 
 #### Install Dependencies
-##### Command to build and run the backend
-##### (Please provide specific build and run instructions)
-```bash
-(Please provide specific build and run instructions)
-```
+    - Make sure building the App under JAVA SDK 21
+    - Change your application.properties for SQL account and password
 
+### 3. Database: PostSQL
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
