@@ -10,7 +10,7 @@
                           <h2 class="title">Sign In</h2>
                           <div class="input_section">
                               <i class="fas fa-envelope"></i>
-                              <input type="text" v-model="signInModel.email" placeholder=" Email">
+                              <input type="text" v-model="signInModel.username" placeholder="username">
                           </div>
                           <div class="input_section">
                               <i class="fas fa-lock"></i>
@@ -24,7 +24,7 @@
                           <h2 class="title">Create Account</h2>
                           <div class="input_section">
                               <i class="fas fa-user"></i>
-                              <input type="text" v-model="member.name" placeholder=" User Name">
+                              <input type="text" v-model="member.username" placeholder=" User Name">
                           </div>
                           <div class="input_section">
                               <i class="fas fa-envelope"></i>
@@ -35,14 +35,13 @@
                               <input type="password" v-model="member.password" placeholder=" Password">
                           </div>
                           <div class="input_section">
-                              <i class="fas fa-lock"></i>
-                              <input type="password" v-model="member.confirmedPassword" placeholder=" Confirm  Password">
+                              <i class="fas fa-envelope"></i>
+                              <input type="text" v-model="member.phoneNumber" placeholder=" Phone Number">
                           </div>
                           <div class="input_section">
                               <i class="fas fa-admin"></i>
                               <select name="" id="" v-model="member.identity">
                                   <option value="">Select User</option>
-                                  <option value="Admin">Admin</option>
                                   <option value="General">General</option>
                               </select>
                               <!-- <input type="password" placeholder=" Confirm  Password"> -->
@@ -85,14 +84,15 @@ import jwt_decode from "jwt-decode";
           return{
               isCreateAccount: false,
               member:{
-                name: '',
+                username: '',
                 email: '',
                 password: '',
                 confirmedPassword: '',
-                identity: '',
+                identity: 'General',
+                phoneNumber: ''
               },
               signInModel:{
-                email: '',
+                username: '',
                 password: '',
               }
           };
@@ -105,32 +105,24 @@ import jwt_decode from "jwt-decode";
               this.isCreateAccount = false;
           },
           async signUpAccount(){
-            try {
-              // console.log(this.member)
-              const newMember = await this.$http.post('/user/register', this.member);
-              // console.log(newMember);
-              this.handleSignIn()
-            } catch (error) {
-              console.log(error);
-              alert("Please Input an Formula Email")
-            }
+
           },
-          signInAccount(){
+          async signInAccount(){
             try {
-              this.$http.post('/user/login', this.signInModel).then(res => {
 
+              const res = await this.$http.post('/users/login', this.signInModel);
+              const userData = res.data
+              console.log(res.data);
+              // Store in local Storage
+              localStorage.setItem("token", JSON.stringify(userData.userType));
+              
+              // If login successfully, page will redirect to '/'
+              this.$router.push('/');
 
-              const { token } = res.data;
-              localStorage.setItem("eleToken", token);
-
-
-              const decode = jwt_decode(token);
-
-                this.$router.push('/');
-              })
             } catch (error) {
-              console.log(error);
-              alert("Please Input an Formula Email")
+              console.log(error.response.data)
+              console.log("Please Input an Formula Email");
+ 
             }
           }
       }
