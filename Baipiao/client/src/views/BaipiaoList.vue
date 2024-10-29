@@ -1,297 +1,510 @@
 <template>
-<body>
-
-<div class="home">
-    <div class="todo-head">
-        <header class="text head-title">Provide Baipiao List</header>
-        <div class="inputDiv">
-            <input type="text" class="userInput" placeholder="Provide Baipiao?">
-            <input class="calender" type="date" placeholder="none" required>
-            <span class="addButton">Add</span>
-        </div>
-    </div>
-    <div class="todo-body">
-        <ul id="myUL"  v-for="(event, index) in events" :key="event.id">
-            <div class="task-bar">
-                <li>{{ event.name }}</li>
-                <span class="task-icon"></span>
+    <div>
+      <!-- Stats cards -->
+      <div class="row">
+        <div
+          class="col-md-6 col-xl-3"
+          v-for="stats in statsCards"
+          :key="stats.title"
+        >
+          <stats-card>
+            <div
+              class="icon-big text-center"
+              :class="`icon-${stats.type}`"
+              slot="header"
+            >
+              <i :class="stats.icon"></i>
             </div>
-          </ul>
+            <div class="numbers" slot="content">
+              <p>{{ stats.title }}</p>
+              {{ events.length }}
+            </div>
+            <div class="stats" slot="footer">
+              <i :class="stats.footerIcon"></i> {{ stats.footerText }}
+            </div>
+          </stats-card>
+        </div>
+      </div>
+      <hr />
+      <!-- Table List -->
+      <div class="row my-5">
+        <div class="col">
+          <table class="table bg-white rounded shadow-lg table-hover">
+            <thead>
+              <tr>
+                <th scope="col" width="10">#</th>
+                <th scope="col">Event</th>
+                <th scope="col">Location</th>
+                <th scope="col">Date</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(event, index) in events" :key="event.id">
+                <th scope="row">{{ index + 1 }}</th>
+                <td>{{ event.name }}</td>
+                <td>{{ event.venue }}</td>
+                <td>{{ event.startDate }}</td>
+                <td>{{ event.status }}</td>
+                <td>
+                  <button @click="viewEvent(event.id)" class="btn btn-primary btn-sm">
+                    View
+                  </button> &nbsp;
+                  <button @click="editEvent(event.id)" class="btn btn-secondary btn-sm">
+                    Edit
+                  </button>&nbsp;
+                  <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
+                    Delete
+                  </button> 
+              </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-right">
+          <button @click="openModal" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+      <!-- Modal Dialog for Creating Events -->
+      <div v-if="showModal" class="modal" tabindex="-1" role="dialog" style="display: block;">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 v-if="modalMode=='create'" class="modal-title">Create New Event</h5>
+              <h5 v-if="modalMode=='edit'" class="modal-title">Edit Event: {{currentEvent.name}}</h5>
+              <h5 v-if="modalMode=='view'" class="modal-title">Event: {{currentEvent.name}}</h5>
+              <button
+                  type="button"
+                  class="close"
+                  @click="closeModal"
+                  aria-label="Close"
+                  style="margin-left: auto"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <!-- Form for creating event -->
+              <form>
+                <div class="form-group">
+                  <label for="eventName">Event Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="eventName"
+                    v-model="currentEvent.name"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+  
+                <div class="form-group">
+                  <label for="eventDetails">Event Details</label>
+                  <textarea
+                    class="form-control"
+                    id="eventDetails"
+                    :disabled="modalMode === 'view'"
+                    rows="3"
+                    required>{{currentEvent.details}}</textarea>
+                </div>
+                <div class="form-group">
+                  <label for="startDate">Start Date</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    id="startDate"
+                    v-model="formattedStartDate"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="endDate">End Date</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    id="endDate"
+                    v-model="formattedEndDate"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group toggle-container">
+                <label for="registrationRequired" class="toggle-label">Registration Required</label> &nbsp; &nbsp;
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="registrationRequired"
+                    v-model="currentEvent.registrationRequired"
+                    :disabled="modalMode === 'view'"
+                    class="toggle-checkbox"
+                  />
+                  <span class="slider"></span>
+                </label>
+              </div>
+                <div class="form-group" v-if="currentEvent.registrationRequired">
+                  <label for="registrationLink">Registration Link</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="registrationLink"
+                    v-model="currentEvent.registrationLink"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group" v-if="currentEvent.registrationRequired">
+                  <label for="registrationDeadline">Registration Deadline</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    id="registrationDeadline"
+                    v-model="formattedRegistrationDeadline"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="contactEmail">Contact Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="contactEmail"
+                    v-model="currentEvent.contactEmail"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="contactPhoneNumber">Contact Phone</label>
+                  <input
+                    type="phone"
+                    class="form-control"
+                    id="contactPhoneNumber"
+                    v-model="currentEvent.contactPhoneNumber"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="capacity">Capacity</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="capacity"
+                    v-model="currentEvent.capacity"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="image">Image</label>
+                  <input
+                    type="url"
+                    class="form-control"
+                    id="image"
+                    v-model="currentEvent.image"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+  
+                <div class="form-group">
+                  <label for="venue">Venue</label>
+                  <v-select
+                    :options="venues"
+                    v-model="currentEvent.venueId"
+                    :reduce="venue => venue.id"
+                    label="name"
+                    placeholder="Search Venue"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+  
+                <div class="form-group">
+                  <label for="category">Category</label>
+                  <v-select
+                    :options="categories"
+                    v-model="currentEvent.categoryId"
+                    :reduce="category => category.id"
+                    label="name"
+                    placeholder="Search Category"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+  
+                <div class="form-group">
+                  <label for="organizer">Organizer</label>
+                  <v-select
+                    :options="organizers"
+                    v-model="currentEvent.organizerId"
+                    :reduce="organizer => organizer.id"
+                    label="name"
+                    placeholder="Search Organizer"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="status">Status</label>
+                  <v-select
+                    :options="eventStatuses"
+                    v-model="currentEvent.status"
+                    :reduce="status => status"
+                    label="status"
+                    :disabled="modalMode === 'view'"
+                    required
+                  />
+                </div>
+                <div class="modal-footer  ">
+                  <button type="submit" class="btn btn-secondary" style="float: right; margin-left: 1em;" @click="closeModal">{{ (modalMode==='view') ? "Close" :  "Cancel" }}</button>
+                  <button v-if="modalMode=='create'" type="submit" class="btn btn-primary" style="float: right"  @click="createEvent">Save</button> 
+                  <button v-if="modalMode=='edit'" type="submit" class="btn btn-primary" style="float: right"  @click="updateEvent">Update</button> 
+                
+                </div>
+                
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-
-<!-- <script src="./js/main.js"></script> -->
-
-</body>
-</template>
-<script>
-
-export default{
-    name:'baipiaolist',
-
+  </template>
+  
+  <script>
+  import { StatsCard } from "@/components/index";
+  import vSelect from "vue-select";
+  import "vue-select/dist/vue-select.css";
+  
+  export default {
+    components: {
+      StatsCard,vSelect
+    },
+    computed: {
+      formattedStartDate: {
+        get() {
+          if (this.currentEvent.startDate) {
+            return this.currentEvent.startDate.slice(0, 16);
+          }
+          return "";
+        },
+        set(value) {
+          this.currentEvent.startDate = value;
+        },
+      },
+      formattedEndDate: {
+        get() {
+          if (this.currentEvent.endDate) {
+            return this.currentEvent.endDate.slice(0, 16);
+          }
+          return "";
+        },
+        set(value) {
+          this.currentEvent.endDate = value;
+        },
+      },
+      formattedRegistrationDeadline: {
+        get() {
+          if (this.currentEvent.registrationDeadline) {
+            return this.currentEvent.registrationDeadline.slice(0, 16);
+          }
+          return "";
+        },
+        set(value) {
+          this.currentEvent.registrationDeadline = value;
+        },
+      },
+    },
     data() {
       return {
-          statsCards: [
-          ],
-          events: [], // To store the fetched events
+        statsCards: [
+          // Example stats
+          {
+            type: "warning",
+            icon: "ti-pencil",
+            title: "Today",
+            value: "10",
+            footerText: "Today",
+            footerIcon: "ti-reload",
+          },
+        ],
+        events: [], // To store the fetched events
+        venues: [],
+        categories: [],
+        organizers: [],
+        eventStatuses: ["upcoming", "completed", "cancelled"],
+        currentEvent: {
+        }, // For storing the new event data from the form
+        modalMode: 'create',
+        showModal: false, // To control the visibility of the modal
       };
-  },
+    },
     methods: {
       async fetchData() {
-          try {
-              const response = await this.$http.get("events");
-              // Assuming the API returns an array of event objects
-              this.events = response.data; 
-          } catch (error) {
-              console.error("Error fetching events:", error);
-          }
+        try {
+          const eventsResponse = await this.$http.get("events");
+          this.events = eventsResponse.data;
+          const venuesResponse = await this.$http.get("venues");
+          this.venues = venuesResponse.data;
+          const categoriesResponse = await this.$http.get("categories");
+          this.categories = categoriesResponse.data;
+          const organizersResponse = await this.$http.get("organizations");
+          this.organizers = organizersResponse.data;
+        } catch (error) {
+          console.error("Error fetching events:", error);
+        }
       },
-  },
-  created() {
-    // Fetch events when the component is created
-    this.fetchData(); 
-  },
-};
-
-</script>
-<style scoped>
-
-/* ===== Todo List Only ===== */
-
-.home{
-    background-color: #f4f3ef;
-    /* position: absolute; */
-    top: 0;
-    top: 0;
-    /* left: 250px; */
-    height: 100%;
-    width: 100%;
-    /* width: calc(100% - 250px); */
-
-    transition: all 0.4s ease;
-}
-
-.home .text{
-    font-size: 35px;
-    font-weight: 500;
-    color: #707070;
-    padding: 12px 60px;
-}
-
-.todo-head {
-  padding: 30px 40px;
-  color: white;
-  text-align: center;
-}
-
-.userInput{
-    margin: 0;
-    border-radius: 6px;
-    background-color: #f4f3ef;
-    border: 2px solid rgb(57, 151, 183);
-    outline: none;
-    width: 65%;
-    height: 65px;
-    padding: 10px;
-    font-size: 20px;
-}
-
-.calender{
-    background-color: #f4f3ef;
-    padding: 10px;
-    width: 140px;
-    border: none;
-    outline: none;
-    border-radius: 6px;
-    font-size: 16px;
-}
-
-.addButton {
-    background-color: #acacac;
-    border: none;
-    border-radius: 6px;
-    color: Black;
-    padding: 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    transition-duration: 0.4s;
-}
-
-.addButton:hover {
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
-}
-
-#myUL{
-    margin: 15px;
-    padding: 15px;
-}
-
-.task-bar{
-  display: flex;
-  flex-direction: row;
-}
-
-.task-bar li {
-    margin: 20px 20px 20px 100px;
-    width: 85%;
-    border-radius: 8px;
-    cursor: pointer;
-    position: relative;
-    padding: 12px 8px 12px 40px;
-    list-style-type: none;
-    background: #f19494;
-    font-size: 25px;
-    text-align: left;
-    transition: 0.2s;
-
-    /* make the list items unselectable */
-    /* -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none; */
-    user-select: none;
-}
-
-.task-icon{
-    margin: 28px 60px 25px -100px;
-    padding: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    font-size: 35px;
-}
-
-.task-icon:hover{
-    opacity: 0.5;
-}
-
-#myUL li:hover {
-    opacity: 0.75;
-}
-
-#myUL li.checked {
-    background: #a4e886;
-    color: #fff;
-    text-decoration: line-through;
-}
-
-#myUL li.checked::before {
-    content: '';
+      createEvent() {
+        console.log(this.currentEvent);
+        this.$http
+          .post("events", this.currentEvent)
+          .then((response) => {
+            this.closeModal(); // Close the modal after creation
+            this.resetNewEvent(); // Reset the form
+            this.fetchData();
+          })
+          .catch((error) => {
+            console.error("Error creating event:", error);
+          });
+      },
+  
+      updateEvent() {
+        // this.currentEvent.location = null;
+        // Send the new event to the server
+        console.log(this.currentEvent); 
+        this.$http
+          .put(`events/${this.currentEvent.id}`, this.currentEvent)
+          .then((response) => {
+            this.closeModal(); // Close the modal after creation
+            this.resetNewEvent(); // Reset the form
+            this.fetchData();
+          })
+          .catch((error) => {
+            console.error("Error updating event:", error);
+          });
+      },
+      closeModal() {
+        this.showModal = false;
+      },
+      openModal() {
+        this.showModal = true;
+        this.modalMode = 'create';
+      },
+  
+      viewEvent(eventId) {
+        this.currentEvent = this.events.filter(event => event.id == eventId)[0]; 
+        this.modalMode = 'view';
+        this.showModal = true;
+      },
+      editEvent(eventId) {
+        this.currentEvent = this.events.filter(event => event.id == eventId)[0]; 
+        this.modalMode = 'edit';
+        this.showModal = true;
+      },
+      resetNewEvent() {
+        // Reset the form fields
+        this.currentEvent = {
+          name: "",
+          location: "",
+          startDate: "",
+          status: "upcoming",
+        };
+      },
+      // Delete Data 
+      async deleteEvent(eventId) {
+        const confirmDelete = confirm("Are you sure you want to delete this event?");
+        if (confirmDelete) {
+          try {
+            await this.$http.delete(`events/${eventId}`);
+            // Update the Event Table
+            this.events = this.events.filter(event => event.id !== eventId); 
+          } catch (error) {
+            console.error("Error deleting event:", error);
+            alert("Delete failed!"); 
+          }
+        }
+      },
+    },
+    created() {
+      this.fetchData(); // Fetch events when the component is created
+    },
+  };
+  </script>
+  
+  <style>
+  .modal {
+    display: block; /* Overriding Bootstrap hidden modal */
+    background-color: rgba(0, 0, 0, 0.5); /* Add a background overlay */
+  }
+  
+  .col {
+    max-height: 400px; 
+    overflow-y: auto;  
+    border: 1px solid #dee2e6; 
+    border-radius: 0.25rem; 
+  }
+  .toggle-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .toggle-checkbox {
     position: absolute;
-    border-color: #fff;
-    border-style: solid;
-    border-width: 0 2px 2px 0;
-    top: 26px;
-    left: 16px;
-    transform: rotate(45deg);
-    height: 15px;
-    width: 8px;
-}
-
-.todo-head:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Set the RWD here for three different size --- Pre 870 570 --- */
-@media (max-width: 570px) {
-    .inputDiv{
-        display: flex;
-        flex-direction: column;
-    }
-
-    .userInput{
-        width: 100%;
-        height: 50px;
-        font-size: 10px;
-    }
-
-    .text.head-title{
-        font-size: 25px;
-    }
-
-    .calender{
-        background-color: #f4f3ef;
-        margin: auto;
-        display: block;
-    }
-
-    .addButton {
-        margin: auto;
-        display: block;
-        width: 60px;
-    }
-
-    #myUL{
-        margin: 0px;
-        padding: 0px;
-    }
-
-    .task-bar li {
-        margin: 20px 20px 20px 20px;
-        width: 100%;
-        padding: 12px 40px;
-        font-size: 15px;
-        text-align: left;
-        /* make the list items unselectable */
-        user-select: none;
-    }
-
-    .task-icon{
-        margin: 28px 60px 25px -80px;
-        padding: 10px;
-        width: 40px;
-        height: 40px;
-        font-size: 30px;
-    }
-}
-
-@media (min-width: 570px) and (max-width: 870px){
-
-
-    .userInput{
-        width: 80%;
-        height: 55px;
-        font-size: 15px;
-    }
-
-    .text.head-title{
-        font-size: 30px;
-    }
-
-    .addButton {
-        margin: auto;
-        display: block;
-        width: 60px;
-    }
-
-    #myUL{
-        margin: 0px;
-        padding: 0px;
-    }
-
-    .task-bar li {
-        margin: 20px 20px 20px 20px;
-        width: 100%;
-        padding: 12px 40px;
-        font-size: 20px;
-        text-align: left;
-        /* make the list items unselectable */
-        user-select: none;
-    }
-
-    .task-icon{
-        margin: 28px 60px 25px -80px;
-        padding: 10px;
-        width: 40px;
-        height: 40px;
-        font-size: 30px;
-    }
-}
-
-
-</style>
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  
+  
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 25px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 21px;
+    width: 21px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: #4caf50;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(25px);
+  }
+  </style>
