@@ -1,7 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-
       <a class="navbar-brand" href="#">{{ routeName }}</a>
       <button
         class="navbar-toggler navbar-burger"
@@ -22,13 +21,14 @@
             title-classes="nav-link"
             icon="ti-settings"
           >
-            <a class="dropdown-item" href="#">Logout</a>
+            <a class="dropdown-item" href="#" @click.prevent="logout">Logout</a>
           </drop-down>
         </ul>
       </div>
     </div>
   </nav>
 </template>
+
 <script>
 export default {
   computed: {
@@ -58,7 +58,12 @@ export default {
     hideSidebar() {
       this.$sidebar.displaySidebar(false);
     },
+    logout() {
+      // clear localStorage
+      localStorage.removeItem("token");
+      // redirect
+      this.$router.push('/login');
+    },
   },
 };
 </script>
-<style></style>
