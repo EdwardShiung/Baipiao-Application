@@ -37,7 +37,7 @@
               <th scope="col">Location</th>
               <th scope="col">Date</th>
               <th scope="col">Status</th>
-              <th scope="col">Action</th>
+              <!-- <th scope="col">Action</th> -->
             </tr>
           </thead>
           <tbody>
@@ -47,7 +47,7 @@
               <td>{{ event.venue }}</td>
               <td>{{ event.startDate }}</td>
               <td>{{ event.status }}</td>
-              <td>
+              <!-- <td>
                 <button @click="viewEvent(event.id)" class="btn btn-primary btn-sm">
                   View
                 </button> &nbsp;
@@ -57,7 +57,7 @@
                 <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
                   Delete
                 </button> 
-            </td>
+            </td> -->
             </tr>
           </tbody>
         </table>

@@ -13,5 +13,3 @@
 # ignore /Baipiao/client/node_modules 
 /Baipiao/client/package-lock.json
 
-# ignore /Baipiao/api/src/main/resources/application.properties
-/Baipiao/api/src/main/resources/application.properties
