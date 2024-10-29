@@ -120,4 +120,26 @@ public class UserController {
         userService.deleteById(id);
         return ResponseEntity.status(204).build();
     }
+    /**
+     * Login a user by username and password.
+     *
+     * @param loginRequest The login request containing username and password.
+     * @return The User object if credentials are valid, else 401 Unauthorized.
+     */
+    @Operation(summary = "Login a user", description = "Login a user by username and password.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login Successfully"),
+            @ApiResponse(responseCode = "401", description = "Invalid userName or password")
+    })
+    @PostMapping("/users/login")
+    public ResponseEntity<UserDTO> login(@RequestBody User.LoginRequest loginRequest) {
+        String userName = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
+
+        UserDTO user = userService.login(userName, password);
+        if (user == null) {
+            return ResponseEntity.status(401).build(); // Unauthorized
+        }
+        return ResponseEntity.ok(user);
+    }
 }

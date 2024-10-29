@@ -1,5 +1,11 @@
+# ignore /Baipiao/api/build/
+/Baipiao/api/build/
+
 # ignore /Baipiao/api/.gradle/ 
 /Baipiao/api/.gradle/
+
+# ignore /Baipiao/api/.idea/
+/Baipiao/api/.idea/ 
 
 # ignore /Baipiao/client/node_modules 
 /Baipiao/client/node_modules/

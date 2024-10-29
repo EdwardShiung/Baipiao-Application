@@ -1,28 +1,17 @@
 package com.baipiao.api.users;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.baipiao.api.events.Event;
 import com.baipiao.api.tickets.Ticket;
 import com.baipiao.api.venues.Venue;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -80,7 +69,10 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.createdAt = createdAt;
     }
-
-
-
+    // Login Request class
+    @Data
+    public static class LoginRequest {
+        private String username;
+        private String password;
+    }
 }
