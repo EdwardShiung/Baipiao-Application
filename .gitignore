@@ -1,0 +1,8 @@
+# ignore /Baipiao/api/.gradle/ 
+/Baipiao/api/.gradle/
+
+# ignore /Baipiao/client/node_modules 
+/Baipiao/client/node_modules/
+
+# ignore /Baipiao/client/node_modules 
+/Baipiao/api/src/main/resources/application.properties
