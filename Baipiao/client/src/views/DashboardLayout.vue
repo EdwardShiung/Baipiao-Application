@@ -82,6 +82,24 @@ export default {
           icon: "ti-tag",
           requiredUserTypes: ['admin'],
         },
+        {
+          name: "Admin Statistics",
+          path: "/baipiaoStat",
+          icon: "ti-dashboard",
+          requiredUserTypes: ['admin'],
+        },
+        {
+          name: "Org Statistics",
+          path: "/baipiaoStat",
+          icon: "ti-dashboard",
+          requiredUserTypes: ['organization'],
+        },
+        {
+          name: "User Statistics",
+          path: "/baipiaoStat",
+          icon: "ti-dashboard",
+          requiredUserTypes: ['user'],
+        },
       ],
     };
   },

@@ -10,7 +10,7 @@ import BaipiaoVenue from '@/views/BaipiaoVenue.vue'
 import BaipiaoCategory from '@/views/BaipiaoCategory.vue'
 import BaipiaoOrganization from '@/views/BaipiaoOrganization.vue'
 import BaipiaoEvent from '@/views/BaipiaoEvent.vue'
-
+import BaipiaoStat from '@/views/BaipiaoStat.vue'
 
 
 Vue.use(VueRouter)
@@ -70,6 +70,12 @@ const routes = [
         name: "baipiaoOrganization",
         component: BaipiaoOrganization,
         meta: {requiresAuth: true, requiredUserTypes: ['admin']}
+      },
+      {
+        path: "baipiaoStat",
+        name: "baipiaoStat",
+        component: BaipiaoStat,
+        meta: {requiresAuth: true, requiredUserTypes: ['admin','organization','user']}
       },
     ],
   },
