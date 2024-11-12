@@ -75,14 +75,18 @@
             <form >
               <div class="form-group">
                 <label for="venueName">Venue Name</label>
-                <input
+                <AutoComplete
                   type="text"
                   class="form-control"
                   id="venueName"
                   v-model="currentVenue.name"
                   :disabled="modalMode === 'view'"
                   required
+                  :suggestions="locations" @complete="searchVenue" 
+                  :blur="setVenueLocation"
+                  :option-unselected="unsetVenueLocation"
                 />
+                
               </div>
               <div class="form-group">
                 <label>Location</label>
@@ -143,10 +147,14 @@
 
 <script>
 import { StatsCard } from "@/components/index";
+import { ref } from "vue";
+import AutoComplete from 'primevue/autocomplete';
+const Nominatim = require('nominatim-geocoder');
+
 
 export default {
   components: {
-    StatsCard,
+    StatsCard,AutoComplete
   },
   data() {
     return {
@@ -161,6 +169,7 @@ export default {
           footerIcon: "ti-reload",
         },
       ],
+      locations: [],
       currentVenue: {},
       venues: [], // To store the fetched venues
       currentVenue: {
@@ -183,6 +192,43 @@ export default {
       } catch (error) {
         console.error("Error fetching venues:", error);
       }
+    },
+
+    searchVenue() {
+      if (this.currentVenue.name.length < 5) {
+        return;
+      }
+      const geocoder = new Nominatim();
+      geocoder.search({ q: `${this.currentVenue.name}` })
+        .then((response) => {
+          this.locations = response.map(item => item.display_name); // Update the suggestions array
+          if (response.length > 0) {
+            this.currentVenue.location.x = response[0].lon;
+            this.currentVenue.location.y = response[0].lat;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    setVenueLocation() {
+      const geocoder = new Nominatim();
+      geocoder.search({ q: `${this.currentVenue.name}` })
+        .then((response) => {
+          if (response.length > 0) {
+            this.currentVenue.location.x = response[0].lon;
+            this.currentVenue.location.y = response[0].lat;
+            console.log(this.currentVenue);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    unsetVenueLocation() {
+      this.currentVenue.location.x =null;
+      this.currentVenue.location.y = null;
+      console.log(this.currentVenue);
     },
     createVenue() {
       this.$http
@@ -273,5 +319,27 @@ export default {
   overflow-y: auto;  
   border: 1px solid #dee2e6; 
   border-radius: 0.25rem; 
+}
+#venueName {
+border: none;
+width: 100%;
+height: 100%;
+background: transparent
+}
+.p-autocomplete-panel {
+    max-height: 200px; /* Controls dropdown height */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background-color: white;
+}
+.p-autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.p-autocomplete-item:hover {
+    background-color: #f0f0f0; /* Light gray background on hover */
 }
 </style>

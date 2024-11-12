@@ -3,22 +3,76 @@
     <hr />
     <!-- Map List -->
     <div class="row my-5">
-      <div class="col-md-4">
+      <div class="col-md-3">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-user"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>User</p> 10
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Total
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-3">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-panel"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Organizations</p> 10
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-3">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-bookmark"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Events</p> 10
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-3">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-target"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Venues</p> 10
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+    </div>
+    <div class="row chart-container">
+      <div class="col-md-4 chart-container">
         <PolarArea :data="eventcategories" :options="eventcategoriesOptions" />
       </div>
       <div class="col-md-4">
         <Bar :data="eventcategories" :options="eventcategoriesOptions" />
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4 chart-container">
         <Pie :data="eventOrganizers" :options="eventOragnizersOptions" />
       </div>
     </div>
     <div class="row chart-container">
-      <div class="col-md-6">
+      <div class="col-md-6 chart-container">
         <LineChart :data="dailyEvents" :options="dailyEventsOptions" />
       </div>
-      <div class="col-md-6">
-        <LineChart :data="dailyEvents" :options="dailyEventsOptions" />
+      <div class="col-md-6 chart-container">  
+          <LineChart :data="dailyEvents" :options="dailyEventsOptions" />
       </div>
     </div>
   </div>
@@ -39,6 +93,7 @@ import {
 
 } from 'chart.js'
 import { Bar, Line as LineChart, PolarArea, Pie } from 'vue-chartjs' 
+import { StatsCard } from "@/components/index";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, TimeScale, Title, Tooltip, Legend, PointElement,RadialLinearScale, ArcElement, LineElement);
 
@@ -47,7 +102,8 @@ export default {
     Bar,
     LineChart,
     PolarArea,
-    Pie
+    Pie,
+    StatsCard
   },
   data() {
     return {
@@ -227,6 +283,6 @@ export default {
 <style scoped>
 .chart-container {
   height: 400px; /* Set your desired height */
-  width: 100%; /* Optional: set width */
+  
 }
 </style>
