@@ -101,4 +101,10 @@ public class EventService {
     public boolean existsById(Long id) {
         return eventRepository.existsById(id);
     }
+
+    public List<EventDTO> getEventsByArea(double centerX, double centerY, double radius) {
+        return eventRepository.getEventsByArea(centerX, centerY, radius).stream().map(event -> {
+            return new EventDTO(event);
+        }).collect(Collectors.toList());
+    }
 }

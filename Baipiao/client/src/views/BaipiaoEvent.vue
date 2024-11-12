@@ -3,9 +3,10 @@
     <hr />
     <!-- Map List -->
     <div class="row my-5">
-      <l-map style="height: 600px" :zoom="zoom" :center="center">
+      <l-map style="height: 600px" :zoom="zoom" :center="center" ref="map">
         <l-tile-layer :url="osmurl" :attribution="attribution"></l-tile-layer>
         <l-geo-json
+          v-if="geoJsonLayer"
           :geojson="formattedEvents"
           :options="geojsonOptions"
           :options-style="styleFunction"
@@ -18,9 +19,13 @@
 <script>
 import { LMap, LTileLayer, LGeoJson } from 'vue2-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // Import leaflet CSS
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet-draw';
 
-// Fix Leaflet default icon issue
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
+import 'leaflet-geosearch/dist/geosearch.css';
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -32,7 +37,7 @@ export default {
   components: {
     LMap,
     LTileLayer,
-    LGeoJson, 
+    LGeoJson,
   },
   computed: {
     styleFunction() {
@@ -44,14 +49,13 @@ export default {
       });
     },
     formattedEvents() {
-      // Convert events data into GeoJSON format
       return {
         type: "FeatureCollection",
         features: this.events.map(event => ({
           type: "Feature",
           geometry: {
             type: "Point",
-            coordinates: [event.longitude, event.latitude], // Use event's longitude and latitude
+            coordinates: [event.longitude, event.latitude],
           },
           properties: {
             name: event.name,
@@ -65,7 +69,7 @@ export default {
     },
     geojsonOptions() {
       return {
-        pointToLayer: this.pointToLayerFunction, // Handle point features as markers
+        pointToLayer: this.pointToLayerFunction,
         onEachFeature: this.onEachFeatureFunction
       };
     },
@@ -77,16 +81,15 @@ export default {
         '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 14,
       center: [37.2307590318061, -80.42062935893475],
-      events: [], // Fetched events, each with longitude, latitude, etc.
+      events: [],
+      geoJsonLayer: null, // Track the GeoJSON layer
     };
   },
   methods: {
     pointToLayerFunction(feature, latlng) {
-      // This function turns each point feature into a marker with the default icon
       return L.marker(latlng, { icon: new L.Icon.Default() });
     },
     onEachFeatureFunction(feature, layer) {
-      // Bind a tooltip with custom event details
       layer.bindTooltip(
         "<div>Name: " + feature.properties.name + "</div>" +
         "<div>Date: " + feature.properties.date + "</div>" +
@@ -96,15 +99,15 @@ export default {
         { permanent: false, sticky: true }
       );
     },
-    async fetchData() {
+    async fetchData(url) {
       try {
-        const eventsResponse = await this.$http.get("events");
+        const eventsResponse = await this.$http.get(url);
         this.events = eventsResponse.data.map(event => ({
           ...event,
           date: event.startDate,
           name: event.name,
-          longitude: event.location.x, // Custom longitude field
-          latitude: event.location.y, // Custom latitude field
+          longitude: event.location.x,
+          latitude: event.location.y,
           venue: event.venue,
           organizer: event.organizer
         }));
@@ -112,12 +115,76 @@ export default {
         console.error("Error fetching events:", error);
       }
     },
+    addSearchControl() {
+      const provider = new OpenStreetMapProvider();
+      const searchControl = new GeoSearchControl({
+        provider: provider,
+        style: 'bar',
+        autoComplete: true,
+        autoCompleteDelay: 250,
+      });
+
+      const map = this.$refs.map.mapObject;
+      map.addControl(searchControl);
+    },
+    addDrawControl() {
+      const map = this.$refs.map.mapObject;
+      const drawControl = new L.Control.Draw({
+        draw: {
+          polyline: false,
+          polygon: false,
+          rectangle: false,
+          marker: false,
+          circlemarker: false,
+          circle: true
+        },
+        edit: {
+          featureGroup: this.drawnItems,
+          remove: false,
+          edit: false
+
+        }
+      });
+      map.addControl(drawControl);
+
+      // Event listener for when a circle is created
+      map.on(L.Draw.Event.CREATED, (e) => {
+        const type = e.layerType;
+        const layer = e.layer;
+
+        if (type === 'circle') {
+          const radius = layer.getRadius();
+          const center = layer.getLatLng();
+          this.fetchData(`events/area/${center.lng}/${center.lat}/${radius}`);
+        }
+
+        // this.drawnItems.addLayer(layer);
+      });
+    },
+    updateGeoJsonLayer() {
+      // Remove the existing GeoJSON layer if present
+      if (this.geoJsonLayer) {
+        this.$refs.map.mapObject.removeLayer(this.geoJsonLayer);
+      }
+
+      // Create a new GeoJSON layer and add it to the map
+      this.geoJsonLayer = L.geoJSON(this.formattedEvents, this.geojsonOptions);
+      this.geoJsonLayer.addTo(this.$refs.map.mapObject);
+    },
   },
+  watch: {
+  events() {
+    this.updateGeoJsonLayer();
+  },
+},
   created() {
-    this.fetchData(); // Fetch events when the component is created
+    this.fetchData("events");
   },
+  mounted() {
+    this.addSearchControl();
+    this.drawnItems = new L.FeatureGroup();
+    this.$refs.map.mapObject.addLayer(this.drawnItems);
+    this.addDrawControl();
+  }
 };
 </script>
-
-<style scoped>
-</style>

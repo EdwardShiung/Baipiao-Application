@@ -129,4 +129,9 @@ public class EventController {
             return ResponseEntity.notFound().build();
         }    
     }
+    @GetMapping("/events/area/{centerX}/{centerY}/{radius}")
+    public ResponseEntity<List<EventDTO>> getEventsByArea(@PathVariable double centerX, @PathVariable double centerY, @PathVariable double radius) {
+        List<EventDTO> events = eventService.getEventsByArea(centerX, centerY, radius);
+        return ResponseEntity.ok(events);
+    }
 }

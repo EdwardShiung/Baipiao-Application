@@ -26,6 +26,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query(value = "SELECT * FROM events WHERE eventname = :eventname", nativeQuery = true)
     Event findEventByEventName(@Param("eventname") String eventName);
 
+
+    //SELECT *
+    @Query(value = "SELECT events.* FROM events JOIN venues on (events.venue_id = venues.id) WHERE ST_DWithin( location::geography, ST_SetSRID(ST_MakePoint(:centerX, :centerY), 4326), :radius)", nativeQuery = true)
+    List<Event> getEventsByArea(double centerX, double centerY, double radius);
     // Create: Insert a new event (not typically done in a repository, but here's a
     // native query version)
     // Create: Insert a new event
