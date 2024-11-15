@@ -40,9 +40,9 @@
                           </div>
                           <div class="input_section">
                               <i class="fas fa-admin"></i>
-                              <select name="" id="" v-model="member.identity">
+                              <select name="" id="" v-model="member.userType">
                                   <option value="">Select User</option>
-                                  <option value="General">General</option>
+                                  <option value="user">user</option>
                               </select>
                               <!-- <input type="password" placeholder=" Confirm  Password"> -->
                           </div>
@@ -87,8 +87,7 @@ import jwt_decode from "jwt-decode";
                 username: '',
                 email: '',
                 password: '',
-                confirmedPassword: '',
-                identity: 'General',
+                userType: 'user',
                 phoneNumber: ''
               },
               signInModel:{
@@ -104,7 +103,22 @@ import jwt_decode from "jwt-decode";
           handleSignIn(){
               this.isCreateAccount = false;
           },
-          async signUpAccount(){
+          async signUpAccount(event) {
+            
+              event.preventDefault(); 
+
+              try {
+                const res = await this.$http.post('/users/register', this.member);
+                // console.log("Registered User_01:", userData);
+
+                this.handleSignIn();
+
+
+              } catch (error) {
+                console.error("Registration Error:_01", error.response.data);
+                this.handleSignIn();
+                // alert(error.response.data.message || "Registration failed. Please try again.");
+              }
 
           },
           async signInAccount(){

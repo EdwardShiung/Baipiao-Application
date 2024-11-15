@@ -1,5 +1,7 @@
 package com.baipiao.api.users;
 
+import com.baipiao.api.users.dto.UserCreateDTO;
+import com.baipiao.api.users.dto.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,9 +11,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.baipiao.api.users.dto.UserCreateDTO;
-import com.baipiao.api.users.dto.UserDTO;
 
 import java.util.List;
 
@@ -138,8 +137,29 @@ public class UserController {
 
         UserDTO user = userService.login(userName, password);
         if (user == null) {
-            return ResponseEntity.status(401).build(); // Unauthorized
+            return ResponseEntity.status(401).build();
         }
         return ResponseEntity.ok(user);
+    }
+
+    /**
+     * Register a new user.
+     *
+     * @param registerRequest The registration details of the user.
+     * @return The created UserDTO if successful, else 400 Bad Request.
+     */
+    @Operation(summary = "Register a new user", description = "Register a user by providing userName, email, password, phoneNumber, and userType.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid registration data")
+    })
+    @PostMapping("/users/register")
+    public ResponseEntity<UserDTO> register(@RequestBody User.RegisterRequest registerRequest) {
+
+        UserDTO newUser = userService.registerWithoutEncoding(registerRequest);
+        if (newUser == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(201).body(newUser);
     }
 }

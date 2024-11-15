@@ -75,4 +75,25 @@ public class User {
         private String username;
         private String password;
     }
+    // Register Request class
+    @Data
+    public static class RegisterRequest {
+        @NotNull
+        @Size(min = 2, max = 256)
+        private String username;
+
+        @NotNull
+        @Size(min = 5, max = 256)
+        private String email;
+
+        @NotNull
+        private String password;
+
+        @NotNull
+        @Size(max = 20)
+        private String phoneNumber;
+
+        @NotNull
+        private  String userType;
+    }
 }

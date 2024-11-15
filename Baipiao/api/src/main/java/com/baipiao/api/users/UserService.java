@@ -5,6 +5,7 @@ import com.baipiao.api.users.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,5 +73,25 @@ public class UserService {
         }
         // Invalid username or password
         return null;
+    }
+    public UserDTO registerWithoutEncoding(User.RegisterRequest registerRequest) {
+        // Verify the username
+        if (userRepository.existsByUserNameOrEmail(registerRequest.getUsername(), registerRequest.getEmail())) {
+            return null;
+        }
+
+        // Create user
+        User user = new User();
+        user.setUserName(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(registerRequest.getPassword());
+        user.setPhoneNumber(registerRequest.getPhoneNumber());
+        user.setUserType(registerRequest.getUserType());
+        user.setCreatedAt(LocalDateTime.now());
+
+        // Save back to DB
+        User savedUser = userRepository.save(user);
+
+        return new UserDTO(savedUser);
     }
 }
