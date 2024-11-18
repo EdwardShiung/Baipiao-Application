@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.baipiao.api.categories.CategoryRepository;
 import com.baipiao.api.organizations.OrganizationRepository;
+import com.baipiao.api.tickets.TicketRepository;
+import com.baipiao.api.tickets.TicketService;
+import com.baipiao.api.users.UserRepository;
 import com.baipiao.api.venues.PointDeserializer;
 import com.baipiao.api.venues.PointSerializer;
 import com.baipiao.api.venues.VenueRepository;
@@ -20,6 +23,8 @@ import com.baipiao.api.events.dto.EventCreateDTO;
 @Service
 public class EventService {
 
+    @Autowired
+    private TicketService ticketService;
     @Autowired
     private EventRepository eventRepository;
     @Autowired
@@ -106,5 +111,17 @@ public class EventService {
         return eventRepository.getEventsByArea(centerX, centerY, radius).stream().map(event -> {
             return new EventDTO(event);
         }).collect(Collectors.toList());
+    }
+
+    public Boolean isRegistered(Long eventId, String username) {
+        return eventRepository.isRegistered(eventId, username);
+    }
+
+    public void register(Long eventId, String username) {
+        ticketService.createTicket(eventId, username);
+    }
+
+    public void unregister(Long eventId, String username) {
+        ticketService.deleteTicket(eventId, username);
     }
 }

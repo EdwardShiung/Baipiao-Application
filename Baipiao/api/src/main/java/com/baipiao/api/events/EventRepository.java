@@ -92,4 +92,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // @Query(value = "DELETE FROM events WHERE id = :id", nativeQuery = true)
     void deleteEventById(@Param("id") Long id);
 
+    @Query(value = "SELECT COUNT(*) > 0 FROM public.tickets t " +
+               "JOIN public.users u ON t.user_id = u.id " +
+               "JOIN public.events e ON t.event_id = e.id " +
+               "WHERE u.username = :username AND e.id = :eventId", 
+       nativeQuery = true)
+    boolean isRegistered(@Param("eventId") Long eventId, @Param("username") String username);
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO public.tickets (event_id, user_id) VALUES (:eventId, :username)", nativeQuery = true)
+    void register(@Param("eventId") Long eventId, @Param("username") String username);
 }

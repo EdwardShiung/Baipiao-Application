@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.baipiao.api.stat.dto.CategoryStat;
 import com.baipiao.api.stat.dto.DailyStat;
 import com.baipiao.api.stat.dto.OrganizerStat;
+import com.baipiao.api.stat.dto.OrganizerUserStat;
 @Service
 public class StatService {
     @Autowired
@@ -55,5 +56,17 @@ public class StatService {
     }
     public Integer getEventsCountNextWeek() {
         return statRepository.getEventsCountNextWeek();
+    }
+
+    public Integer getEventsRegistered(String username) {
+        return statRepository.getEventsRegistered(username);
+    }
+
+    public Integer getEventsAttended(String username) {
+        return statRepository.getEventsAttended(username);
+    }
+
+    public OrganizerUserStat getOrganizerStats() {
+        return statRepository.getOrganizerStats();
     }
 }

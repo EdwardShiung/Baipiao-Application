@@ -134,4 +134,20 @@ public class EventController {
         List<EventDTO> events = eventService.getEventsByArea(centerX, centerY, radius);
         return ResponseEntity.ok(events);
     }
+    @GetMapping("/events/isRegistered/{id}/{username}")
+    public ResponseEntity<Boolean> isRegistered(@PathVariable Long id, @PathVariable String username) {
+        Boolean result = eventService.isRegistered(id, username);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/events/register/{id}/{username}")
+    public ResponseEntity register(@PathVariable Long id, @PathVariable String username) {
+        eventService.register(id, username);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/events/unregister/{id}/{username}")
+    public ResponseEntity unregister(@PathVariable Long id, @PathVariable String username) {
+        eventService.unregister(id, username);
+        return ResponseEntity.ok().build();
+    }
 }

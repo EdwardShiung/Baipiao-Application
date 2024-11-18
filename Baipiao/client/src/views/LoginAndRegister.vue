@@ -129,6 +129,7 @@ import jwt_decode from "jwt-decode";
               console.log(res.data);
               // Store in local Storage
               localStorage.setItem("token", JSON.stringify(userData.userType));
+              localStorage.setItem("username", userData.userName);
               
               // If login successfully, page will redirect to '/'
               this.$router.push('/');

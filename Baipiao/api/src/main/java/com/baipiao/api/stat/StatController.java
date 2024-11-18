@@ -101,5 +101,23 @@ public class StatController {
         Integer stats = statService.getEventsCountNextWeek();
         return ResponseEntity.ok(stats);
     }
+
+    @GetMapping("/eventsRegistered/{username}")
+    public ResponseEntity<Integer> eventsRegistered(@PathVariable String username) {
+        Integer stats = statService.getEventsRegistered(username);
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/eventsAttended/{username}")
+    public ResponseEntity<Integer> eventsAttended(@PathVariable String username) {
+        Integer stats = statService.getEventsAttended(username);
+        return ResponseEntity.ok(stats);
+    }
+   
+    @GetMapping("/organizerStats")
+    public ResponseEntity<OrganizerUserStat> organizerStats() {
+        OrganizerUserStat stats = statService.getOrganizerStats();
+        return ResponseEntity.ok(stats);
+    }
    
 }

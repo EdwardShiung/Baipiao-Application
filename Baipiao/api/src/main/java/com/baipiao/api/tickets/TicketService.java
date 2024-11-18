@@ -1,9 +1,12 @@
 package com.baipiao.api.tickets;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.baipiao.api.organizations.OrganizationRepository;
+import com.baipiao.api.users.User;
 import com.baipiao.api.users.UserRepository;
 import com.baipiao.api.tickets.TicketRepository;
 import com.baipiao.api.tickets.dto.TicketCreateDTO;
@@ -66,5 +69,32 @@ public class TicketService {
                 .orElseThrow(() -> new TicketNotFoundException(eventId, userId));
         ticketRepository.updateTicket(eventId, userId, ticket.getRegistrationDate(), ticket.getTicketNo(),
                 ticket.getStatus());
+    }
+    public void createTicket(Long eventId, String username) {
+        User user = userRepository.findUserByUserName(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found with username: " + username);
+        }
+
+        // Generate a ticket number
+        String ticketNumber = String.format("T:%d_%d", eventId, user.getId());
+
+        // Insert the ticket
+        ticketRepository.insertTicket(
+            eventId,
+            user.getId(),
+            LocalDateTime.now(), // Use java.time.LocalDateTime
+            ticketNumber,
+            "registered"
+        );
+    }
+
+    public void deleteTicket(Long eventId, String username) {
+        User user = userRepository.findUserByUserName(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found with username: " + username);
+        }
+
+        ticketRepository.deleteTicket( eventId, user.getId());
     }
 }

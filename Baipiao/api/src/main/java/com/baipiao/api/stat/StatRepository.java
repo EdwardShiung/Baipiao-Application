@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import com.baipiao.api.stat.dto.*;
 @Repository
@@ -97,4 +98,65 @@ public class StatRepository {
         return result != null ? ((Number) result).intValue() : 0;
     }
 
+
+    public Integer getEventsRegistered(String username) {
+        String sql = "SELECT COUNT(t.event_id) AS event_count " +
+                     "FROM public.tickets t " +
+                     "JOIN public.events e ON t.event_id = e.id " +
+                     "JOIN public.users u ON t.user_id = u.id " +
+                     "WHERE u.username = :username";
+        Query query = this.entityManager.createNativeQuery(sql);
+        query.setParameter("username", username); // Set parameter
+        Object result = query.getSingleResult();
+        return result != null ? ((Number) result).intValue() : 0; // Safely cast result
+    }
+    
+    public Integer getEventsAttended(String username) {
+        String sql = "SELECT COUNT(t.event_id) AS event_count " +
+                     "FROM public.tickets t " +
+                     "JOIN public.events e ON t.event_id = e.id " +
+                     "JOIN public.users u ON t.user_id = u.id " +
+                     "WHERE e.end_date < CURRENT_DATE AND u.username = :username";
+        Query query = this.entityManager.createNativeQuery(sql);
+        query.setParameter("username", username); // Set parameter
+        Object result = query.getSingleResult();
+        return result != null ? ((Number) result).intValue() : 0; // Safely cast result
+    }
+
+    OrganizerUserStat getOrganizerStats() {
+        String sql = "SELECT " +
+        "COUNT(e.id) AS totalEvents, " +
+        "COUNT(t.user_id) AS totalAttendance, " +
+        "MIN(attendance.attendance) AS minAttendance, " +
+        "MAX(attendance.attendance) AS maxAttendance, " +
+        "AVG(attendance.attendance) AS averageAttendance, " +
+        "SUM(e.capacity) AS totalCapacity, " +
+        "MIN(e.capacity) AS minCapacity, " +
+        "MAX(e.capacity) AS maxCapacity, " +
+        "AVG(e.capacity) AS averageCapacity " +
+        "FROM Events e " +
+        "LEFT JOIN Tickets t ON e.id = t.event_id " +
+        "LEFT JOIN (" +
+        "   SELECT t.event_id, COUNT(t.user_id) AS attendance " +
+        "   FROM Tickets t GROUP BY t.event_id" +
+        ") AS attendance ON e.id = attendance.event_id";
+
+        Query query = entityManager.createNativeQuery(sql);
+        Object[] resultArray = (Object[]) query.getSingleResult();
+
+        // Map the result to OrganizerUserStat
+        OrganizerUserStat result = new OrganizerUserStat(
+            ((Number) resultArray[0]).longValue(),  // totalEvents
+            ((Number) resultArray[1]).longValue(),  // totalAttendance
+            resultArray[2] != null ? ((Number) resultArray[2]).longValue() : null, // minAttendance
+            resultArray[3] != null ? ((Number) resultArray[3]).longValue() : null, // maxAttendance
+            resultArray[4] != null ? (BigDecimal) resultArray[4] : null, // averageAttendance
+            ((Number) resultArray[5]).longValue(),  // totalCapacity
+            ((Number) resultArray[6]).longValue(),  // minCapacity
+            ((Number) resultArray[7]).longValue(),  // maxCapacity
+            resultArray[8] != null ? (BigDecimal) resultArray[8] : null // averageCapacity
+        );
+
+        return result;
+    }
 }

@@ -83,12 +83,6 @@ export default {
           requiredUserTypes: ['admin'],
         },
         {
-          name: "User Statistics",
-          path: "/baipiaoUserStat",
-          icon: "ti-dashboard",
-          requiredUserTypes: ['user'],
-        },
-        {
           name: "Admin Statistics",
           path: "/baipiaoStat",
           icon: "ti-dashboard",
