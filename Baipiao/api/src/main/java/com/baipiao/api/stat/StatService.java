@@ -23,5 +23,37 @@ public class StatService {
 
     public List<DailyStat> getDailyStat() {
         return statRepository.getDailyStat();
-}
+    }
+    public Integer getUserCount() {
+        return statRepository.getUserCount();
+    }
+    public Integer getEventsCount() {
+        return statRepository.getEventsCount();
+    }
+    public Double getAvgEventCapacity() {
+        return statRepository.getAvgEventCapacity();
+    }
+    public Integer getMinEventCapacity() {
+        return statRepository.getMinEventCapacity();
+    }
+    public Integer getMaxEventCapacity() {
+        return statRepository.getMaxEventCapacity();
+    }
+    public Integer getOrganizationsCount() {
+        return statRepository.getOrganizationsCount();
+    }
+
+    public Integer getVenuesCount() {
+        return statRepository.getVenuesCount();
+    }
+
+    public Integer getEventsCountToday() {
+        return statRepository.getEventsCountToday();
+    }
+    public Integer getEventsCountThisWeek() {
+        return statRepository.getEventsCountThisWeek();
+    }
+    public Integer getEventsCountNextWeek() {
+        return statRepository.getEventsCountNextWeek();
+    }
 }

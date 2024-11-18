@@ -47,6 +47,59 @@ public class StatController {
         return ResponseEntity.ok(stats);
     }
 
+    @GetMapping("/userscount")
+    public ResponseEntity<Integer> usersCount() {
+        Integer stats = statService.getUserCount();
+        return ResponseEntity.ok(stats);
+    }
 
+    @GetMapping("/organizationscount")
+    public ResponseEntity<Integer> organizationsCount() {
+        Integer stats = statService.getOrganizationsCount();
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/eventscount")
+    public ResponseEntity<Integer> eventsCount() {
+        Integer stats = statService.getEventsCount();
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/avgEventCapacity")
+    public ResponseEntity<Double> avgEventCapacity() {
+        Double stats = statService.getAvgEventCapacity();
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/minEventCapacity")
+    public ResponseEntity<Integer> minEventCapacity() {
+        Integer stats = statService.getMinEventCapacity();
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/maxEventCapacity")
+    public ResponseEntity<Integer> maxEventCapacity() {
+        Integer stats = statService.getMaxEventCapacity();
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/venuesCount")
+    public ResponseEntity<Integer> venuesCount() {
+        Integer stats = statService.getVenuesCount();
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/eventsCountToday")
+    public ResponseEntity<Integer> eventsCountToday() {
+        Integer stats = statService.getEventsCountToday();
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/eventsCountThisWeek")
+    public ResponseEntity<Integer> eventsCountThisWeek() {
+        Integer stats = statService.getEventsCountThisWeek();
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/eventsCountNextWeek")
+    public ResponseEntity<Integer> eventsCountNextWeek() {
+        Integer stats = statService.getEventsCountNextWeek();
+        return ResponseEntity.ok(stats);
+    }
    
 }

@@ -1,6 +1,74 @@
 <template>
   <div>
     <hr />
+    <div class="row">
+      <div class="col-md-2">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-user"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Events today</p> {{ eventsTodayCount }}
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-3">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-user"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Events this Week</p> {{ eventsThisWeekCount }}
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-2">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-user"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Events next Week</p> {{ eventsNextWeekCount }}
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-3">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-user"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Events this Week</p> {{ 1 }}
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      <div class="col-md-2">
+        <stats-card>
+          <div class="icon-big text-center icon-warning" slot="header" >
+            <i class="ti-user"></i>
+          </div>
+          <div class="numbers" slot="content">
+            <p>Events this Week</p> {{ 1 }}
+          </div>
+          <div class="stats" slot="footer">
+            <i class="ti-reload"></i> Count
+          </div>
+        </stats-card>
+      </div>
+      
+     </div>
     <!-- Map List -->
     <div class="row my-5">
       <l-map style="height: 600px" :zoom="zoom" :center="center" ref="map">
@@ -19,6 +87,8 @@
 <script>
 import { LMap, LTileLayer, LGeoJson } from 'vue2-leaflet';
 import L from 'leaflet';
+import { StatsCard } from "@/components/index";
+
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-draw';
 
@@ -38,6 +108,7 @@ export default {
     LMap,
     LTileLayer,
     LGeoJson,
+    StatsCard
   },
   computed: {
     styleFunction() {
@@ -83,6 +154,9 @@ export default {
       center: [37.2307590318061, -80.42062935893475],
       events: [],
       geoJsonLayer: null, // Track the GeoJSON layer
+      eventsTodayCount:0,
+      eventsThisWeekCount:0,
+      eventsNextWeekCount:0
     };
   },
   methods: {
@@ -111,9 +185,21 @@ export default {
           venue: event.venue,
           organizer: event.organizer
         }));
+      
+
+        const eventsTodayResponse = await this.$http.get("eventsCountToday");
+        this.eventsTodayCount = eventsTodayResponse.data;
+
+        const eventsThisWeekResponse = await this.$http.get("eventsCountThisWeek");
+        this.eventsThisWeekCount = eventsThisWeekResponse.data;
+
+        const eventsNextWeekResponse = await this.$http.get("eventsCountNextWeek");
+        this.eventsNextWeekCount = eventsNextWeekResponse.data;
       } catch (error) {
         console.error("Error fetching events:", error);
       }
+
+
     },
     addSearchControl() {
       const provider = new OpenStreetMapProvider();

@@ -9,10 +9,10 @@
             <i class="ti-user"></i>
           </div>
           <div class="numbers" slot="content">
-            <p>User</p> 10
+            <p>Total User</p> {{ usersCount }}
           </div>
           <div class="stats" slot="footer">
-            <i class="ti-reload"></i> Total
+            <i class="ti-reload"></i> Count
           </div>
         </stats-card>
       </div>
@@ -22,7 +22,7 @@
             <i class="ti-panel"></i>
           </div>
           <div class="numbers" slot="content">
-            <p>Organizations</p> 10
+            <p>No. of Organizations</p> {{ organizationsCount }}
           </div>
           <div class="stats" slot="footer">
             <i class="ti-reload"></i> Count
@@ -35,10 +35,10 @@
             <i class="ti-bookmark"></i>
           </div>
           <div class="numbers" slot="content">
-            <p>Events</p> 10
+            <p>Events</p> {{ eventsCount }}
           </div>
           <div class="stats" slot="footer">
-            <i class="ti-reload"></i> Count
+            <i class="ti-reload"></i> Avg Capacity: {{ avgEventCapacity }} -  Min Capacity: {{ minEventCapacity }}  - Max Capacity: {{ maxEventCapacity }}
           </div>
         </stats-card>
       </div>
@@ -48,7 +48,7 @@
             <i class="ti-target"></i>
           </div>
           <div class="numbers" slot="content">
-            <p>Venues</p> 10
+            <p>Venues</p> {{ venuesCount }}
           </div>
           <div class="stats" slot="footer">
             <i class="ti-reload"></i> Count
@@ -57,22 +57,17 @@
       </div>
     </div>
     <div class="row chart-container">
-      <div class="col-md-4 chart-container">
+      <div class="col-md-3 chart-container">
         <PolarArea :data="eventcategories" :options="eventcategoriesOptions" />
       </div>
+      <div class="col-md-1" />
       <div class="col-md-4">
-        <Bar :data="eventcategories" :options="eventcategoriesOptions" />
-      </div>
-      <div class="col-md-4 chart-container">
-        <Pie :data="eventOrganizers" :options="eventOragnizersOptions" />
-      </div>
-    </div>
-    <div class="row chart-container">
-      <div class="col-md-6 chart-container">
         <LineChart :data="dailyEvents" :options="dailyEventsOptions" />
+        <!-- <Bar :data="eventcategories" :options="eventcategoriesOptions" /> -->
       </div>
-      <div class="col-md-6 chart-container">  
-          <LineChart :data="dailyEvents" :options="dailyEventsOptions" />
+      <div class="col-md-1" />
+      <div class="col-md-3 chart-container" style="height: 400px;">
+        <Pie :data="eventOrganizers" :options="eventOragnizersOptions" />
       </div>
     </div>
   </div>
@@ -115,6 +110,13 @@ export default {
         labels: [],
         datasets: [{ data: [] }]
       },
+      usersCount: 0,
+      organizationsCount:0,
+      eventsCount: 0,
+      avgEventCapacity: 0.0,
+      minEventCapacity: 0.0,
+      maxEventCapacity: 0.0,
+      venuesCount:0,
       dailyEvents: {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
         datasets: [
@@ -236,9 +238,6 @@ export default {
 
 
 
-
-        /////
-
         const dailyEventsResponse = await this.$http.get("dailyEvents");
         const dailyEvents = dailyEventsResponse.data;
 
@@ -269,9 +268,31 @@ export default {
           }]
         };
 
-      } catch (error) {
-        console.error("Error fetching events:", error);
+
+        const usersResponse = await this.$http.get("userscount");
+        this.usersCount = usersResponse.data;
+
+
+        const organizationsResponse = await this.$http.get("organizationscount");
+        this.organizationsCount = organizationsResponse.data;
+
+        const eventsResponse = await this.$http.get("eventscount");
+        this.eventsCount = eventsResponse.data;
+        const avgEventsResponse = await this.$http.get("avgEventCapacity");
+        this.avgEventCapacity = avgEventsResponse.data;
+        const minEventsResponse = await this.$http.get("minEventCapacity");
+        this.minEventCapacity = minEventsResponse.data;
+        const maxEventsResponse = await this.$http.get("maxEventCapacity");
+        this.maxEventCapacity = maxEventsResponse.data;
+
+        
+        const venuesResponse = await this.$http.get("venuesCount");
+        this.venuesCount = venuesResponse.data;
+        
+      }catch (error) {
+        console.error("Error fetching states:", error);
       }
+
     },
   },
   created() {

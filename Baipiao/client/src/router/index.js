@@ -76,7 +76,7 @@ const routes = [
         name: "baipiaoStat",
         component: BaipiaoStat,
         meta: {requiresAuth: true, requiredUserTypes: ['admin','organization','user']}
-      },
+      }
     ],
   },
   {
