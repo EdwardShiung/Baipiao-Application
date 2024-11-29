@@ -173,10 +173,10 @@
                     <button @click="viewEvent(event.id)" class="btn btn-primary btn-sm">
                       View
                     </button> &nbsp;
-                    <button @click="editEvent(event.id)" class="btn btn-secondary btn-sm">
+                    <button v-if="usertype!='user'"  @click="editEvent(event.id)" class="btn btn-secondary btn-sm">
                       Edit
                     </button>&nbsp;
-                    <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
+                    <button v-if="usertype!='user'"  @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
                       Delete
                     </button> 
                 </td>
