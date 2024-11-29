@@ -189,7 +189,7 @@
 
     </div>
     <div class="row">
-        <div class="col text-right">
+        <div class="col text-right" v-if="usertype!='user'">
           <button @click="openModal" class="btn btn-primary">Create</button>
         </div>
       </div>

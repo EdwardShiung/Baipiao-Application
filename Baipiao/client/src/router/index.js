@@ -25,7 +25,7 @@ const routes = [
   {
     path: '/',
     component: DashboardLayout,
-    redirect: 'dashboard',
+    redirect: 'baipiaoEvents',
     children:[
       {
         path: "dashboard",

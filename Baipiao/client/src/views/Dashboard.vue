@@ -38,7 +38,7 @@
               <th scope="col">Location</th>
               <th scope="col">Date</th>
               <th scope="col">Status</th>
-              <!-- <th scope="col">Action</th> -->
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -48,24 +48,24 @@
               <td>{{ event.venue }}</td>
               <td>{{ event.startDate }}</td>
               <td>{{ event.status }}</td>
-              <!-- <td>
+              <td>
                 <button @click="viewEvent(event.id)" class="btn btn-primary btn-sm">
                   View
                 </button> &nbsp;
-                <button @click="editEvent(event.id)" class="btn btn-secondary btn-sm">
+                <button v-if="usertype!='user'"  @click="editEvent(event.id)" class="btn btn-secondary btn-sm">
                   Edit
                 </button>&nbsp;
-                <button @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
+                <button v-if="usertype!='user'"  @click="deleteEvent(event.id)" class="btn btn-danger btn-sm">
                   Delete
                 </button> 
-            </td> -->
+            </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
     <div class="row">
-      <div class="col text-right">
+      <div class="col text-right" v-if="usertype!='user'">
         <button @click="openModal" class="btn btn-primary">Create</button>
       </div>
     </div>
@@ -338,6 +338,7 @@ export default {
       venues: [],
       categories: [],
       organizers: [],
+      usertype: localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token")) : null,
       eventStatuses: ["upcoming", "completed", "cancelled"],
       currentEvent: {
       }, // For storing the new event data from the form

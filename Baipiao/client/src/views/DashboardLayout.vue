@@ -2,7 +2,7 @@
   <div class="wrapper">
     <side-bar>
       <template slot="links">
-        <sidebar-link to="/" name="Baipiao Events" icon="ti-calendar" />
+        <!-- <sidebar-link to="/" name="Baipiao Events" icon="ti-calendar" /> -->
         <sidebar-link
           v-for="item in filteredMenuItems"
           :key="item.name"
@@ -52,12 +52,12 @@ export default {
           icon: "ti-map",
           requiredUserTypes: ['admin', 'organization', 'user'], 
         },
-        {
-          name: "Baipiao list",
-          path: "/baipiaolist",
-          icon: "ti-map",
-          requiredUserTypes: ['admin'], 
-        },
+        // {
+        //   name: "Baipiao list",
+        //   path: "/baipiaolist",
+        //   icon: "ti-map",
+        //   requiredUserTypes: ['admin'], 
+        // },
         {
           name: "Users",
           path: "/baipiaouser",
