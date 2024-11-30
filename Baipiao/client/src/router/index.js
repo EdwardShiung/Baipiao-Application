@@ -11,6 +11,7 @@ import BaipiaoCategory from '@/views/BaipiaoCategory.vue'
 import BaipiaoOrganization from '@/views/BaipiaoOrganization.vue'
 import BaipiaoEvent from '@/views/BaipiaoEvent.vue'
 import BaipiaoStat from '@/views/BaipiaoStat.vue'
+import PasswordChange from '@/views/PasswordChange.vue'
 
 
 Vue.use(VueRouter)
@@ -75,6 +76,12 @@ const routes = [
         path: "baipiaoStat",
         name: "baipiaoStat",
         component: BaipiaoStat,
+        meta: {requiresAuth: true, requiredUserTypes: ['admin','organization','user']}
+      },
+      {
+        path: "passwordChange",
+        name: "passwordChange",
+        component: PasswordChange,
         meta: {requiresAuth: true, requiredUserTypes: ['admin','organization','user']}
       }
     ],

@@ -162,4 +162,57 @@ public class UserController {
         }
         return ResponseEntity.status(201).body(newUser);
     }
+    /**
+     * Retrieve a specific user by providing its ID as a query parameter.
+     *
+     * @param id The ID of the user to be retrieved.
+     * @return The User object with the specified ID.
+     */
+    @Operation(summary = "Get a user by ID (Query Parameter)", description = "Retrieve a specific user by providing its ID as a query parameter.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the user"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid query parameter")
+    })
+    @GetMapping("/users/retrieve")
+    public ResponseEntity<UserDTO> retrieveUserById(@RequestParam Long id) {
+        if (id == null) {
+            // Return 400 Bad Request if ID is null
+            return ResponseEntity.badRequest().build();
+        }
+
+        UserDTO retrievedUser = userService.find(id);
+        if (retrievedUser == null) {
+            throw new UserNotFoundException(id);
+        }
+        return ResponseEntity.ok(retrievedUser);
+    }
+
+
+    /**
+     * Update a user's password.
+     *
+     * @param updatePasswordRequest Object containing the user ID and new password.
+     * @return A ResponseEntity indicating the status of the operation.
+     */
+    @Operation(summary = "Update user password", description = "Update a user's password by providing their ID and new password in the request body.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Password updated successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
+    @PutMapping("/users/update-password")
+    public ResponseEntity<Void> updatePassword(
+            @RequestBody User.UpdatePasswordRequest updatePasswordRequest) {
+
+        // Validate the request parameters
+        if (updatePasswordRequest.getId() == null || updatePasswordRequest.getNewPassword() == null || updatePasswordRequest.getNewPassword().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Call the service layer to update the password
+        userService.updatePassword(updatePasswordRequest.getId(), updatePasswordRequest.getNewPassword());
+
+        return ResponseEntity.ok().build(); // Return 200 if the password is updated successfully
+    }
 }

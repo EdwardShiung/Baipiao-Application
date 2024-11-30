@@ -52,12 +52,6 @@ export default {
           icon: "ti-map",
           requiredUserTypes: ['admin', 'organization', 'user'], 
         },
-        // {
-        //   name: "Baipiao list",
-        //   path: "/baipiaolist",
-        //   icon: "ti-map",
-        //   requiredUserTypes: ['admin'], 
-        // },
         {
           name: "Users",
           path: "/baipiaouser",
@@ -94,6 +88,12 @@ export default {
           icon: "ti-dashboard",
           requiredUserTypes: ['organization'],
         },
+        {
+          name: "Account Setting",
+          path: "/passwordChange",
+          icon: "ti-settings",
+          requiredUserTypes: ['admin', 'organization', 'user']
+        }
       ],
     };
   },

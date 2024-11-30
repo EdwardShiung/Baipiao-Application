@@ -94,4 +94,17 @@ public class UserService {
 
         return new UserDTO(savedUser);
     }
+    /**
+     * Update the password of an existing user.
+     *
+     * @param id          The ID of the user whose password will be updated.
+     * @param newPassword The new password to set for the user.
+     */
+    public void updatePassword(Long id, String newPassword) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+        // Update the password
+        user.setPassword(newPassword);
+        // Save the updated user back to the database
+        userRepository.save(user);
+    }
 }

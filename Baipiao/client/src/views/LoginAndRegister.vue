@@ -113,13 +113,11 @@ import jwt_decode from "jwt-decode";
 
                 this.handleSignIn();
 
-
               } catch (error) {
                 console.error("Registration Error:_01", error.response.data);
                 this.handleSignIn();
                 // alert(error.response.data.message || "Registration failed. Please try again.");
               }
-
           },
           async signInAccount(){
             try {
@@ -127,6 +125,9 @@ import jwt_decode from "jwt-decode";
               const res = await this.$http.post('/users/login', this.signInModel);
               const userData = res.data
               console.log(res.data);
+              
+              localStorage.setItem("userData", JSON.stringify(userData.id));
+
               // Store in local Storage
               localStorage.setItem("token", JSON.stringify(userData.userType));
               localStorage.setItem("username", userData.userName);

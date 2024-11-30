@@ -96,4 +96,10 @@ public class User {
         @NotNull
         private  String userType;
     }
+    @Data
+    public static class UpdatePasswordRequest {
+        // Add the user ID
+        private Long id;
+        private String newPassword;
+    }
 }

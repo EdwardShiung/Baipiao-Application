@@ -1,0 +1,22 @@
++------------------------+-------------------------------+----------------+
+|     Task Description   |        Team Member           | Progress Status|
++------------------------+-------------------------------+----------------+
+| Project Proposal       | Tian Yu (Edward) Shiung/     | Completed      |
+|                        | Yoseph Berhanu               |                |
++------------------------+-------------------------------+----------------+
+| ER Diagram Report      | Tian Yu (Edward) Shiung/     | Completed      |
+|                        | Yoseph Berhanu               |                |
++------------------------+-------------------------------+----------------+
+| Relational Schema      | Tian Yu (Edward) Shiung/     | Completed      |
+| Diagram                | Yoseph Berhanu               |                |
++------------------------+-------------------------------+----------------+
+| Front-end              | Tian Yu (Edward) Shiung/     | Completed      |
+|                        | Yoseph Berhanu               |                |
++------------------------+-------------------------------+----------------+
+| Back-end               | Tian Yu (Edward) Shiung/     | Completed      |
+|                        | Yoseph Berhanu               |                |
++------------------------+-------------------------------+----------------+
+| SQL Schema             | Tian Yu (Edward) Shiung/     | Completed      |
+|                        | Yoseph Berhanu               |                |
++------------------------+-------------------------------+----------------+
+
